@@ -1739,11 +1739,16 @@ function refreshDashboard() {
   const scoreColor = score >= 85 ? 'var(--green)' : score >= 70 ? 'var(--amber)' : 'var(--red)';
 
   // ── KPIs ──
-  const fmtBRL = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const dailyR  = hasAtivos ? baseRef * weightedNetYield/100/365 : 0;
-  const monthR  = hasAtivos ? baseRef * weightedNetYield/100/12  : 0;
-  const yearR   = hasAtivos ? baseRef * weightedNetYield/100     : 0;
-  const dailyPct = hasAtivos ? (Math.pow(1+weightedNetYield/100,1/365)-1)*100 : 0;
+  // Taxas periódicas por juros compostos (capitalização exponencial):
+  //   r_diária  = (1 + r_anual)^(1/365) − 1
+  //   r_mensal  = (1 + r_anual)^(1/12)  − 1
+  // Os valores em R$ derivam das mesmas taxas compostas para total consistência.
+  const fmtBRL   = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dailyPct  = hasAtivos ? (Math.pow(1 + weightedNetYield/100, 1/365) - 1) * 100 : 0;
+  const monPct    = hasAtivos ? (Math.pow(1 + weightedNetYield/100, 1/12)  - 1) * 100 : 0;
+  const dailyR    = baseRef * dailyPct / 100;
+  const monthR    = baseRef * monPct   / 100;
+  const yearR     = hasAtivos ? baseRef * weightedNetYield / 100 : 0;
 
   refreshPatrimonioKpi(false);
   const $ = id => document.getElementById(id);
@@ -1753,7 +1758,7 @@ function refreshDashboard() {
   if ($('kpi-rent-sub'))  $('kpi-rent-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${dailyPct.toFixed(4).replace('.',',')}%&nbsp;/&nbsp;dia · ${weightedNetYield.toFixed(2).replace('.',',')}% a.a.</span>` : 'R$/dia estimado';
   // Mensal
   if ($('kpi-real'))      $('kpi-real').textContent   = hasAtivos ? fmtBRL(monthR) : '—';
-  if ($('kpi-real-sub'))  $('kpi-real-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${monthlyYield.toFixed(2).replace('.',',')}%&nbsp;/&nbsp;mês</span>` : 'R$/mês estimado';
+  if ($('kpi-real-sub'))  $('kpi-real-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${monPct.toFixed(2).replace('.',',')}%&nbsp;/&nbsp;mês</span>` : 'R$/mês estimado';
   // Anual
   if ($('kpi-score'))     { $('kpi-score').textContent = hasAtivos ? fmtBRL(yearR) : '—'; $('kpi-score').style.color = 'var(--green)'; }
   if ($('kpi-score-sub')) $('kpi-score-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${weightedNetYield.toFixed(2).replace('.',',')}%&nbsp;a.a. líq.</span>` : 'R$/ano estimado';
@@ -2177,13 +2182,13 @@ function initCwsDashboard() {
   const monthlyYield = hasAtivos ? (Math.pow(1 + weightedNet/100, 1/12) - 1)*100 : 0;
   const rendMes    = Math.round(total * monthlyYield / 100);
 
-  // ── KPIs ──
+  // ── KPIs — capitalização composta em todos os horizontes ──
   const fmtB  = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const dayR  = hasAtivos ? total * weightedNet/100/365 : 0;
-  const monR  = hasAtivos ? total * weightedNet/100/12  : 0;
-  const yrR   = hasAtivos ? total * weightedNet/100     : 0;
-  const dayPct= hasAtivos ? (Math.pow(1+weightedNet/100,1/365)-1)*100 : 0;
-  const monPct= hasAtivos ? (Math.pow(1+weightedNet/100,1/12)-1)*100  : 0;
+  const dayPct = hasAtivos ? (Math.pow(1 + weightedNet/100, 1/365) - 1) * 100 : 0;
+  const monPct = hasAtivos ? (Math.pow(1 + weightedNet/100, 1/12)  - 1) * 100 : 0;
+  const dayR   = total * dayPct / 100;
+  const monR   = total * monPct / 100;
+  const yrR    = hasAtivos ? total * weightedNet / 100 : 0;
 
   document.getElementById('cws-kpis').innerHTML = `
     <div class="kpi fade-up">
@@ -2665,8 +2670,10 @@ function runSimObjetivo() {
   const fmtPct= v => v.toFixed(2).replace('.',',') + '%';
 
   // Month-by-month projection → array of yearly snapshots
+  // IMPORTANTE: usa taxa mensal por capitalização composta (1+r_anual)^(1/12)−1
+  // Garante que 12 meses compostos = exatamente a taxa anual declarada.
   function projectYears(rate, P0, pmt, years) {
-    const m = rate / 12;
+    const m = Math.pow(1 + rate, 1/12) - 1;  // taxa mensal composta
     let v = P0, totalAportado = P0;
     const arr = [{ year:0, nominal:Math.round(P0), aportado:Math.round(P0), juros:0, real:Math.round(P0) }];
     for (let yr = 1; yr <= years; yr++) {
@@ -2687,17 +2694,18 @@ function runSimObjetivo() {
   const consData = projectYears(consRate, P, aporte, maxAnos);
   const otimData = projectYears(otimRate, P, aporte, maxAnos);
 
-  // Time to goal (months)
+  // Tempo até meta (meses) — taxa mensal composta
   function monthsToGoal(rate, P0, pmt, target) {
-    const m = rate / 12;
+    const m = Math.pow(1 + rate, 1/12) - 1;
     let v = P0, mo = 0;
     while (v < target && mo < 600) { v = v * (1 + m) + pmt; mo++; }
     return v >= target ? mo : null;
   }
 
-  // Required PMT to hit goal in maxAnos with base rate
+  // Aporte mensal necessário — fórmula FV com taxa mensal composta
   function requiredPMT(rate, P0, target, years) {
-    const n = years * 12, m = rate / 12;
+    const m = Math.pow(1 + rate, 1/12) - 1;
+    const n = years * 12;
     const fvP = P0 * Math.pow(1 + m, n);
     if (fvP >= target) return 0;
     return (target - fvP) * m / (Math.pow(1 + m, n) - 1);
@@ -2754,7 +2762,7 @@ function runSimObjetivo() {
       <div class="sim-info-row"><span class="sim-info-label">🛡️ Conservador (−25% na taxa · ${fmtPct(consRate*100)} a.a.)</span><span class="sim-info-val" style="color:var(--amber)">${toYears(consMo)}</span></div>
       <div class="sim-info-row"><span class="sim-info-label">Total aportado (${maxAnos} anos)</span><span class="sim-info-val">${fmtK(totalAportado)}</span></div>
       <div class="sim-info-row"><span class="sim-info-label">Juros compostos gerados (base)</span><span class="sim-info-val" style="color:var(--green)">${fmtK(juros)}</span></div>
-      <div class="sim-info-row" style="border:none"><span class="sim-info-label">Renda passiva mensal estimada</span><span class="sim-info-val" style="color:var(--green)">${fmt(finalBase * baseRate / 12 * 0.85)}</span></div>
+      <div class="sim-info-row" style="border:none"><span class="sim-info-label">Renda passiva mensal estimada</span><span class="sim-info-val" style="color:var(--green)">${fmt(finalBase * (Math.pow(1 + baseRate, 1/12) - 1))}</span></div>
     </div>`;
 
   // ── Show charts section ──
@@ -2799,9 +2807,9 @@ function _simDrawStress(P, baseRate, aporte, years, fmt, fmtK) {
   const el = document.getElementById('sim-stress-items');
   if (!el) return;
 
-  // Stress 1: Bear market -30% first year
+  // Stress 1: Bear market -30% first year — taxa mensal composta
   function projectFinal(rate, P0, pmt, yrs) {
-    const m = rate/12; let v=P0;
+    const m = Math.pow(1 + rate, 1/12) - 1; let v=P0;
     for(let y=0;y<yrs;y++) for(let mo=0;mo<12;mo++) v=v*(1+m)+pmt;
     return v;
   }
@@ -2930,9 +2938,9 @@ function runSimRetirada() {
   const patNeeded_otim = Math.round(W / SWR_otim);
   const swrAtual = P0 > 0 ? W / P0 : 0;
 
-  // Month-by-month depletion
+  // Depleção mês a mês — taxa mensal composta: (1+r_anual)^(1/12)−1
   function calcDurMonths(P_init, annualW, rate, inflation, maxYrs) {
-    const r = rate / 12;
+    const r = Math.pow(1 + rate, 1/12) - 1;
     let v = P_init;
     for (let mo = 0; mo < maxYrs * 12; mo++) {
       v = v * (1 + r) - (annualW / 12) * Math.pow(1 + inflation, mo / 12);
@@ -2941,9 +2949,9 @@ function runSimRetirada() {
     return maxYrs * 12; // survived
   }
 
-  // Year-by-year projection
+  // Projeção ano a ano — taxa mensal composta
   function projectRet(P_init, annualW, rate, inflation, yrs) {
-    const r = rate / 12;
+    const r = Math.pow(1 + rate, 1/12) - 1;
     let v = P_init;
     const arr = [{year:0, saldo:P_init, retirada:0, rendimento:0, inflW:annualW}];
     for (let yr = 1; yr <= yrs; yr++) {
@@ -3549,10 +3557,13 @@ function saveAtivos(cid, list) { localStorage.setItem(ativosKey(cid), JSON.strin
 
 // ── Cálculo de rentabilidade ──
 function calcIRRate(days) {
-  if (!days || days <= 180) return 0.225;
-  if (days <= 360) return 0.20;
-  if (days <= 720) return 0.175;
-  return 0.15;
+  // days=0 → liquidez diária → investidor de longo prazo → alíquota 15%
+  // days>0 → prazo fixo → tabela regressiva pelo prazo de vencimento
+  if (!days)        return 0.15;   // D+0 / D+1: liquidez diária, horizonte longo
+  if (days <= 180)  return 0.225;  // até 6 meses: 22,5%
+  if (days <= 360)  return 0.20;   // 6–12 meses: 20,0%
+  if (days <= 720)  return 0.175;  // 1–2 anos:   17,5%
+  return 0.15;                     // acima de 2 anos: 15,0%
 }
 function calcGrossYield(item) {
   switch(item.rateType) {
@@ -3777,8 +3788,9 @@ function renderDailyYield(ativos, ids) {
   const rows = ativos.map(a => {
     const net     = calcNetYield(a);
     const val     = a.investedValue || 0;
-    const daily    = val * net / 100 / 365;
-    const monthly  = val * net / 100 / 12;
+    // Capitalização composta: r_diária = (1+r_anual)^(1/365)−1
+    const daily    = val * (Math.pow(1 + net/100, 1/365) - 1);
+    const monthly  = val * (Math.pow(1 + net/100, 1/12)  - 1);
     totalDay   += daily;
     totalMonth += monthly;
     return `<tr>
