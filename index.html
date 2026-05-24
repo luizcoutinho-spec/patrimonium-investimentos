@@ -452,6 +452,50 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 .sim-result-label{font-size:13px;color:var(--txt2)}
 .sim-result-val{font-size:14px;font-weight:700;font-family:'DM Mono',monospace}
 
+/* ── SIMULADOR AVANÇADO ── */
+.sim-tabs{display:flex;gap:8px;margin-bottom:20px}
+.sim-tab{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--txt2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.sim-tab.active{border-color:var(--green);background:var(--green-dim);color:var(--green);font-weight:600}
+.sim-tab:hover:not(.active){background:var(--bg-card2);color:var(--txt)}
+.sim-kpi{background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.sim-kpi-label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.sim-kpi-val{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;color:var(--txt);line-height:1.2}
+.sim-kpi-sub{font-size:11px;color:var(--txt3);margin-top:3px;line-height:1.3}
+.sim-btn{display:block;width:100%;padding:13px;background:var(--green);color:#000;font-weight:700;font-size:14px;border:none;border-radius:10px;cursor:pointer;letter-spacing:.3px;transition:opacity .2s;margin-top:14px}
+.sim-btn:hover{opacity:.88}
+.sim-field{width:100%;padding:10px 14px;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:14px;font-family:'DM Mono',monospace;outline:none;box-sizing:border-box;transition:border-color .2s}
+.sim-field:focus{border-color:var(--green)}
+.sim-section-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px}
+.sim-table{width:100%;border-collapse:collapse;font-size:12px}
+.sim-table th{text-align:right;padding:8px 10px;color:var(--txt3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.sim-table th:first-child{text-align:left}
+.sim-table td{text-align:right;padding:8px 10px;color:var(--txt2);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px}
+.sim-table td:first-child{text-align:left;color:var(--txt);font-family:inherit;font-size:12px;font-weight:500}
+.sim-table tr:last-child td{border-bottom:none}
+.sim-table tbody tr:hover td{background:rgba(255,255,255,.025)}
+.sim-table .goal-row td{color:var(--green);font-weight:700}
+.sim-stress-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg-card2)}
+.sim-stress-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sim-stress-info{flex:1;min-width:0}
+.sim-stress-title{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.sim-stress-sub{font-size:11px;color:var(--txt3);line-height:1.3}
+.sim-stress-result{text-align:right;flex-shrink:0}
+.sim-stress-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+.sim-stress-vsub{font-size:10px;color:var(--txt3);margin-top:1px}
+.sim-score-ring{display:flex;gap:20px;align-items:center;margin:8px 0 14px}
+.sim-info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.sim-info-row:last-child{border-bottom:none}
+.sim-info-label{color:var(--txt2)}
+.sim-info-val{font-weight:600;font-family:'DM Mono',monospace;color:var(--txt)}
+.sim-metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.sim-metric-box{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.sim-metric-lbl{font-size:10px;color:var(--txt3);margin-bottom:3px}
+.sim-metric-val{font-size:14px;font-weight:700;font-family:'DM Mono',monospace}
+.sim-placeholder{text-align:center;padding:48px 24px}
+.sim-placeholder-icon{font-size:44px;margin-bottom:14px}
+.sim-placeholder-title{font-size:15px;font-weight:600;color:var(--txt);margin-bottom:8px}
+.sim-placeholder-sub{font-size:13px;color:var(--txt2);line-height:1.5}
+
 /* ── INSIGHTS ── */
 .insight-item{padding:14px 16px;border-left:2px solid var(--green);background:var(--green-dim);border-radius:0 8px 8px 0;margin-bottom:10px}
 .insight-item.warn{border-color:var(--amber);background:var(--amber-dim)}
@@ -1227,44 +1271,175 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 
       <!-- ─────── SIMULADOR ─────── -->
       <div class="view" id="view-simulador">
-        <div class="grid-55">
-          <div class="card">
-            <div class="card-title">Parâmetros da Simulação</div>
-            <div class="sim-control">
-              <div class="sim-label">Aporte mensal <span id="sim-aporte-lbl">R$ 5.000</span></div>
-              <input type="range" class="sim-range" id="sim-aporte" min="500" max="50000" step="500" value="5000" oninput="updateSim()">
-            </div>
-            <div class="sim-control">
-              <div class="sim-label">Horizonte <span id="sim-anos-lbl">10 anos</span></div>
-              <input type="range" class="sim-range" id="sim-anos" min="1" max="30" step="1" value="10" oninput="updateSim()">
-            </div>
-            <div class="sim-control">
-              <div class="sim-label">Taxa anual esperada <span id="sim-taxa-lbl">13,65%</span></div>
-              <input type="range" class="sim-range" id="sim-taxa" min="8" max="20" step="0.25" value="13.65" oninput="updateSim()">
-            </div>
-            <div class="sim-control">
-              <div class="sim-label">Inflação anual projetada <span id="sim-ipca-lbl">4,50%</span></div>
-              <input type="range" class="sim-range" id="sim-ipca" min="2" max="12" step="0.25" value="4.5" oninput="updateSim()">
-            </div>
-            <div class="card" style="background:var(--bg-card2);border-color:var(--border);padding:16px;margin-top:4px">
-              <div class="sim-result-row"><span class="sim-result-label">Patrimônio projetado (nominal)</span><span class="sim-result-val" id="sim-nominal" style="color:var(--green)">—</span></div>
-              <div class="sim-result-row"><span class="sim-result-label">Patrimônio projetado (real)</span><span class="sim-result-val" id="sim-real" style="color:var(--amber)">—</span></div>
-              <div class="sim-result-row"><span class="sim-result-label">Renda passiva mensal estimada</span><span class="sim-result-val" id="sim-renda" style="color:var(--green)">—</span></div>
-              <div class="sim-result-row"><span class="sim-result-label">Total aportado</span><span class="sim-result-val" id="sim-total-aport">—</span></div>
-              <div class="sim-result-row"><span class="sim-result-label">Juros compostos gerados</span><span class="sim-result-val" id="sim-juros">—</span></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title">Projeção Patrimonial — 3 Cenários</div>
-            <div class="chart-wrap" style="height:320px"><canvas id="chartSim"></canvas></div>
-            <div style="display:flex;gap:20px;margin-top:14px;font-size:11px">
-              <span style="color:var(--green)">● Otimista (+2%)</span>
-              <span style="color:var(--txt2)">● Base</span>
-              <span style="color:var(--amber)">● Conservador (−2%)</span>
-            </div>
-          </div>
+
+        <!-- Tab switcher -->
+        <div class="sim-tabs">
+          <button class="sim-tab active" id="sim-tab-obj" onclick="switchSimTab('objetivo')">🎯&nbsp; Objetivo Financeiro</button>
+          <button class="sim-tab" id="sim-tab-ret" onclick="switchSimTab('retirada')">🏖️&nbsp; Fase de Retirada</button>
         </div>
-      </div>
+
+        <!-- ═══ PANE: OBJETIVO FINANCEIRO ═══ -->
+        <div id="sim-pane-objetivo">
+          <div class="grid-55">
+
+            <!-- LEFT: inputs -->
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-title">Carteira em Análise</div>
+                <div id="sim-obj-carteira-info"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Parâmetros do Objetivo</div>
+                <div class="sim-section-title">Patrimônio Alvo</div>
+                <input class="sim-field" id="sim-target" type="text" placeholder="R$ 1.000.000" autocomplete="off">
+                <div class="sim-section-title">Aporte Mensal Adicional</div>
+                <div class="sim-control">
+                  <div class="sim-label">Mensal&nbsp;<span id="sim-obj-aporte-lbl">R$ 0</span></div>
+                  <input type="range" class="sim-range" id="sim-obj-aporte" min="0" max="50000" step="500" value="0" oninput="simObjUpdateLabels()">
+                </div>
+                <div class="sim-section-title">Horizonte Máximo</div>
+                <div class="sim-control">
+                  <div class="sim-label">Prazo&nbsp;<span id="sim-obj-anos-lbl">20 anos</span></div>
+                  <input type="range" class="sim-range" id="sim-obj-anos" min="1" max="40" step="1" value="20" oninput="simObjUpdateLabels()">
+                </div>
+                <div class="sim-section-title">Inflação Projetada (IPCA)</div>
+                <div class="sim-control">
+                  <div class="sim-label">IPCA&nbsp;<span id="sim-obj-ipca-lbl">5,20%</span></div>
+                  <input type="range" class="sim-range" id="sim-obj-ipca" min="2" max="12" step="0.25" value="5.2" oninput="simObjUpdateLabels()">
+                </div>
+                <button class="sim-btn" onclick="runSimObjetivo()">▶&nbsp; Simular Objetivo</button>
+              </div>
+            </div>
+
+            <!-- RIGHT: results -->
+            <div>
+              <div id="sim-obj-placeholder" class="card sim-placeholder">
+                <div class="sim-placeholder-icon">🎯</div>
+                <div class="sim-placeholder-title">Simule seu Objetivo Financeiro</div>
+                <div class="sim-placeholder-sub">Defina um patrimônio alvo e descubra o caminho para alcançá-lo com base na sua carteira atual, considerando cenários conservador, base e otimista.</div>
+              </div>
+              <div id="sim-obj-kpis" style="display:none;margin-bottom:14px"></div>
+              <div id="sim-obj-resultado" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- Full-width charts + table -->
+          <div id="sim-obj-charts-wrap" style="display:none">
+            <div class="grid-55" style="margin-bottom:16px">
+              <div class="card">
+                <div class="card-title">Projeção Patrimonial — 3 Cenários</div>
+                <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px;flex-wrap:wrap">
+                  <span style="color:var(--green)">● Otimista</span>
+                  <span style="color:rgba(148,163,184,.9)">● Base</span>
+                  <span style="color:var(--amber)">● Conservador</span>
+                  <span style="color:rgba(148,163,184,.4)">- - Real (base)</span>
+                  <span style="color:rgba(239,68,68,.7)">— Meta</span>
+                </div>
+                <div class="chart-wrap" style="height:300px"><canvas id="sim-chart-evolution"></canvas></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Composição do Crescimento</div>
+                <div class="chart-wrap" style="height:300px"><canvas id="sim-chart-composition"></canvas></div>
+                <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;flex-wrap:wrap">
+                  <span style="color:var(--green)">■ Rendimentos</span>
+                  <span style="color:rgba(59,130,246,.8)">■ Aportes</span>
+                  <span style="color:rgba(148,163,184,.4)">■ Capital inicial</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid-55" style="margin-bottom:16px">
+              <div class="card">
+                <div class="card-title">Cenários de Stress de Mercado</div>
+                <div id="sim-stress-items"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Score de Eficiência da Carteira</div>
+                <div id="sim-efficiency-score"></div>
+                <div class="sim-section-title">Sugestões de Otimização</div>
+                <div id="sim-suggestions"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:24px">
+              <div class="card-title">Evolução Patrimonial — Ano a Ano</div>
+              <div style="overflow-x:auto"><table class="sim-table" id="sim-obj-table"></table></div>
+            </div>
+          </div>
+        </div><!-- /pane-objetivo -->
+
+        <!-- ═══ PANE: FASE DE RETIRADA ═══ -->
+        <div id="sim-pane-retirada" style="display:none">
+          <div class="grid-55">
+
+            <!-- LEFT: inputs -->
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-title">Carteira em Análise</div>
+                <div id="sim-ret-carteira-info"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Parâmetros de Retirada</div>
+                <div class="sim-section-title">Retirada Anual Desejada</div>
+                <input class="sim-field" id="sim-ret-anual" type="text" placeholder="R$ 50.000" autocomplete="off">
+                <div class="sim-section-title" style="margin-top:14px">Patrimônio Inicial na Fase de Retirada</div>
+                <input class="sim-field" id="sim-ret-patrimonio" type="text" placeholder="R$ 0" autocomplete="off">
+                <div class="sim-section-title" style="margin-top:14px">Duração da Retirada</div>
+                <div class="sim-control">
+                  <div class="sim-label">Período&nbsp;<span id="sim-ret-anos-lbl">30 anos</span></div>
+                  <input type="range" class="sim-range" id="sim-ret-anos" min="5" max="50" step="1" value="30" oninput="simRetUpdateLabels()">
+                </div>
+                <div class="sim-section-title">Taxa de Rendimento na Retirada</div>
+                <div class="sim-control">
+                  <div class="sim-label">Taxa líq.&nbsp;<span id="sim-ret-taxa-lbl">10,00%</span></div>
+                  <input type="range" class="sim-range" id="sim-ret-taxa" min="4" max="18" step="0.25" value="10" oninput="simRetUpdateLabels()">
+                </div>
+                <div class="sim-section-title">Inflação Projetada (IPCA)</div>
+                <div class="sim-control">
+                  <div class="sim-label">IPCA&nbsp;<span id="sim-ret-ipca-lbl">5,20%</span></div>
+                  <input type="range" class="sim-range" id="sim-ret-ipca" min="2" max="12" step="0.25" value="5.2" oninput="simRetUpdateLabels()">
+                </div>
+                <button class="sim-btn" onclick="runSimRetirada()">▶&nbsp; Simular Retirada</button>
+              </div>
+            </div>
+
+            <!-- RIGHT: results -->
+            <div>
+              <div id="sim-ret-placeholder" class="card sim-placeholder">
+                <div class="sim-placeholder-icon">🏖️</div>
+                <div class="sim-placeholder-title">Planeje sua Renda Passiva</div>
+                <div class="sim-placeholder-sub">Defina quanto deseja retirar por ano e veja se sua carteira sustenta o objetivo no longo prazo, com análise de probabilidade de sobrevivência e cenários de stress.</div>
+              </div>
+              <div id="sim-ret-kpis" style="display:none;margin-bottom:14px"></div>
+              <div id="sim-ret-resultado" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- Full-width charts + table -->
+          <div id="sim-ret-charts-wrap" style="display:none">
+            <div class="grid-55" style="margin-bottom:16px">
+              <div class="card">
+                <div class="card-title">Evolução do Patrimônio na Fase de Retirada</div>
+                <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px">
+                  <span style="color:var(--green)">● Taxa cons. (−20%)</span>
+                  <span style="color:rgba(148,163,184,.9)">● Base</span>
+                  <span style="color:var(--amber)">● Taxa agressiva (+20%)</span>
+                </div>
+                <div class="chart-wrap" style="height:300px"><canvas id="sim-chart-retirada"></canvas></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Cenários de Stress na Retirada</div>
+                <div id="sim-ret-stress"></div>
+                <div class="sim-section-title" style="margin-top:14px">Alocação Ideal para Preservação</div>
+                <div id="sim-ret-alocacao"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:24px">
+              <div class="card-title">Fluxo de Caixa Projetado — Ano a Ano</div>
+              <div style="overflow-x:auto"><table class="sim-table" id="sim-ret-table"></table></div>
+            </div>
+          </div>
+        </div><!-- /pane-retirada -->
+
+      </div><!-- /view-simulador -->
 
       <!-- ─────── SAÚDE ─────── -->
       <div class="view" id="view-saude">
@@ -1470,8 +1645,6 @@ function initApp() {
     initMacroView();
     initSaudeView();
     initRebalView();
-    updateSim();
-    setTimeout(() => initSimChart(), 100);
   }, 400);
 }
 
@@ -1984,7 +2157,7 @@ function cwsNav(section, el) {
     initSimuladorView();
   } else if (section === 'rebalanceamento') {
     document.getElementById('view-rebalanceamento').classList.add('active');
-    initRebalanceView();
+    initRebalView();
   }
 }
 
@@ -2356,67 +2529,549 @@ async function refreshMacroView() {
   await initMacroView();
 }
 
-// ══════════════════ SIMULATOR ══════════════════
-let simChart = null;
-function updateSim() {
-  const aporte = parseInt(document.getElementById('sim-aporte').value);
-  const anos = parseInt(document.getElementById('sim-anos').value);
-  const taxa = parseFloat(document.getElementById('sim-taxa').value) / 100;
-  const ipca = parseFloat(document.getElementById('sim-ipca').value) / 100;
-  document.getElementById('sim-aporte-lbl').textContent = 'R$ ' + aporte.toLocaleString('pt-BR');
-  document.getElementById('sim-anos-lbl').textContent = anos + (anos===1?' ano':' anos');
-  document.getElementById('sim-taxa-lbl').textContent = (taxa*100).toFixed(2).replace('.',',') + '%';
-  document.getElementById('sim-ipca-lbl').textContent = (ipca*100).toFixed(2).replace('.',',') + '%';
-  const m = taxa/12, n = anos*12;
-  const futureVal = S.wealth * Math.pow(1+m,n) + aporte * ((Math.pow(1+m,n)-1)/m);
-  const realRate = (1+taxa)/(1+ipca)-1;
-  const mReal = realRate/12;
-  const futureReal = S.wealth * Math.pow(1+mReal,n) + aporte * ((Math.pow(1+mReal,n)-1)/mReal);
-  const totalAport = S.wealth + aporte * n;
-  const juros = futureVal - totalAport;
-  const rendaMensal = futureVal * (taxa/12) * 0.85; // after IR
-  const fmt = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
-  document.getElementById('sim-nominal').textContent = fmt(futureVal);
-  document.getElementById('sim-real').textContent = fmt(futureReal);
-  document.getElementById('sim-renda').textContent = fmt(rendaMensal);
-  document.getElementById('sim-total-aport').textContent = fmt(totalAport);
-  document.getElementById('sim-juros').textContent = fmt(juros);
-  if (simChart) updateSimChart(anos, taxa, aporte, ipca);
+// ══════════════════ SIMULADOR AVANÇADO ══════════════════
+const _simCharts = {};
+
+function _destroySimChart(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const ex = Chart.getChart(el);
+  if (ex) ex.destroy();
 }
-function initSimChart() {
-  const anos = parseInt(document.getElementById('sim-anos').value);
-  const taxa = parseFloat(document.getElementById('sim-taxa').value)/100;
-  const aporte = parseInt(document.getElementById('sim-aporte').value);
-  const ipca = parseFloat(document.getElementById('sim-ipca').value)/100;
-  const labels = Array.from({length:anos+1},(_,i)=>i===0?'Hoje':i+'a');
-  function project(rate) {
-    const m = rate/12; let v = S.wealth;
-    return Array.from({length:anos+1},(_,i)=>{ const r = Math.round(v); if(i>0){v=v*(1+m)+aporte;} return r; });
+
+function _makeSimChart(id, config) {
+  _destroySimChart(id);
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return new Chart(el.getContext('2d'), config);
+}
+
+// ── Init: popula info da carteira e defaults ──
+function initSimuladorView() {
+  const c   = _activeCarteira || { id:'principal', name:'Principal', profile:S.profile, wealth:S.wealth };
+  const cid = c.id;
+  const ativos = getAtivos(cid);
+  const total  = ativos.reduce((s,a) => s + (a.investedValue||0), 0);
+  const hasAtivos = total > 0;
+  const weightedNet = hasAtivos
+    ? ativos.reduce((s,a) => s + calcNetYield(a)*(a.investedValue||0), 0) / total
+    : CDI_RATE * 0.85;
+
+  const fmtBRL = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+  const profLabel = (c.profile||'conservador').charAt(0).toUpperCase() + (c.profile||'conservador').slice(1);
+
+  const infoHTML = `
+    <div class="sim-info-row"><span class="sim-info-label">Carteira</span><span class="sim-info-val">${c.name||'Principal'}</span></div>
+    <div class="sim-info-row"><span class="sim-info-label">Perfil</span><span class="sim-info-val">${profLabel}</span></div>
+    <div class="sim-info-row"><span class="sim-info-label">Patrimônio atual</span><span class="sim-info-val" style="color:var(--green)">${fmtBRL(total)}</span></div>
+    <div class="sim-info-row"><span class="sim-info-label">Ativos</span><span class="sim-info-val">${ativos.length}</span></div>
+    <div class="sim-info-row" style="border:none"><span class="sim-info-label">Taxa líq. ponderada</span><span class="sim-info-val">${weightedNet.toFixed(2).replace('.',',')}% a.a.</span></div>`;
+
+  const oi = document.getElementById('sim-obj-carteira-info');
+  if (oi) oi.innerHTML = infoHTML;
+  const ri = document.getElementById('sim-ret-carteira-info');
+  if (ri) ri.innerHTML = infoHTML;
+
+  // Defaults — set only once (don't overwrite if user already changed them)
+  const tEl = document.getElementById('sim-target');
+  if (tEl && !tEl.dataset.set) {
+    const def = Math.max(1000000, total > 0 ? Math.round(total * 5 / 100000) * 100000 : 1000000);
+    tEl.value = 'R$ ' + def.toLocaleString('pt-BR');
+    tEl.dataset.set = '1';
   }
-  const base = project(taxa);
-  const otim = project(taxa+0.02);
-  const cons = project(Math.max(taxa-0.02,0.04));
-  const ctx = document.getElementById('chartSim').getContext('2d');
-  const g1 = ctx.createLinearGradient(0,0,0,300);
-  g1.addColorStop(0,'rgba(0,212,170,.2)'); g1.addColorStop(1,'rgba(0,212,170,0)');
-  simChart = new Chart(ctx, {
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Otimista',data:otim,borderColor:'#00d4aa',backgroundColor:g1,borderWidth:2,fill:true,tension:0.4,pointRadius:0},
-      {label:'Base',data:base,borderColor:'rgba(148,163,184,.6)',backgroundColor:'transparent',borderWidth:2,fill:false,tension:0.4,pointRadius:0},
-      {label:'Conservador',data:cons,borderColor:'rgba(245,158,11,.5)',backgroundColor:'transparent',borderWidth:1.5,fill:false,tension:0.4,pointRadius:0,borderDash:[4,4]},
-    ]},
-    options: chartDefaults({y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10},maxTicksLimit:10},grid:{display:false},border:{display:false}}})
+  const rpEl = document.getElementById('sim-ret-patrimonio');
+  if (rpEl && !rpEl.dataset.set) {
+    rpEl.value = total > 0 ? fmtBRL(total) : '';
+    rpEl.dataset.set = '1';
+  }
+  // Rate slider: use actual portfolio rate
+  const rateEl = document.getElementById('sim-ret-taxa');
+  if (rateEl && !rateEl.dataset.set) {
+    rateEl.value = Math.max(4, Math.min(18, Math.round(weightedNet * 4) / 4));
+    rateEl.dataset.set = '1';
+  }
+
+  simObjUpdateLabels();
+  simRetUpdateLabels();
+
+  // Format R$ inputs on focus/blur
+  ['sim-target','sim-ret-anual','sim-ret-patrimonio'].forEach(fid => {
+    const el = document.getElementById(fid);
+    if (!el || el.dataset.fmtBound) return;
+    el.dataset.fmtBound = '1';
+    el.addEventListener('focus', function() {
+      this.value = this.value.replace(/[^\d]/g, '');
+    });
+    el.addEventListener('blur', function() {
+      const v = parseInt(this.value.replace(/[^\d]/g,''));
+      if (v > 0) this.value = 'R$ ' + v.toLocaleString('pt-BR');
+    });
   });
 }
-function updateSimChart(anos, taxa, aporte, ipca) {
-  const labels = Array.from({length:anos+1},(_,i)=>i===0?'Hoje':i+'a');
-  function project(rate){const m=rate/12;let v=S.wealth;return Array.from({length:anos+1},(_,i)=>{const r=Math.round(v);if(i>0){v=v*(1+m)+aporte;}return r;});}
-  simChart.data.labels = labels;
-  simChart.data.datasets[0].data = project(taxa+0.02);
-  simChart.data.datasets[1].data = project(taxa);
-  simChart.data.datasets[2].data = project(Math.max(taxa-0.02,0.04));
-  simChart.update();
+
+function switchSimTab(tab) {
+  document.getElementById('sim-tab-obj').classList.toggle('active', tab === 'objetivo');
+  document.getElementById('sim-tab-ret').classList.toggle('active', tab === 'retirada');
+  document.getElementById('sim-pane-objetivo').style.display = tab === 'objetivo' ? '' : 'none';
+  document.getElementById('sim-pane-retirada').style.display = tab === 'retirada' ? '' : 'none';
+}
+
+function simObjUpdateLabels() {
+  const aporte = parseInt(document.getElementById('sim-obj-aporte')?.value || 0);
+  const anos   = parseInt(document.getElementById('sim-obj-anos')?.value || 20);
+  const ipca   = parseFloat(document.getElementById('sim-obj-ipca')?.value || 5.2);
+  const al = document.getElementById('sim-obj-aporte-lbl'); if (al) al.textContent = 'R$ ' + aporte.toLocaleString('pt-BR');
+  const yl = document.getElementById('sim-obj-anos-lbl');   if (yl) yl.textContent = anos + (anos===1?' ano':' anos');
+  const il = document.getElementById('sim-obj-ipca-lbl');   if (il) il.textContent = ipca.toFixed(2).replace('.',',') + '%';
+}
+
+function simRetUpdateLabels() {
+  const anos = parseInt(document.getElementById('sim-ret-anos')?.value || 30);
+  const ipca = parseFloat(document.getElementById('sim-ret-ipca')?.value || 5.2);
+  const taxa = parseFloat(document.getElementById('sim-ret-taxa')?.value || 10);
+  const yl = document.getElementById('sim-ret-anos-lbl'); if (yl) yl.textContent = anos + (anos===1?' ano':' anos');
+  const il = document.getElementById('sim-ret-ipca-lbl'); if (il) il.textContent = ipca.toFixed(2).replace('.',',') + '%';
+  const tl = document.getElementById('sim-ret-taxa-lbl'); if (tl) tl.textContent = taxa.toFixed(2).replace('.',',') + '%';
+}
+
+// ─────────────────────────────────────────────
+//   SIMULAÇÃO DE OBJETIVO FINANCEIRO
+// ─────────────────────────────────────────────
+function runSimObjetivo() {
+  const c   = _activeCarteira || { id:'principal', profile:S.profile };
+  const cid = c.id;
+  const ativos = getAtivos(cid);
+  const P = ativos.reduce((s,a) => s + (a.investedValue||0), 0);
+
+  // Parse inputs
+  const FV     = parseInt((document.getElementById('sim-target').value||'').replace(/[^\d]/g,'')) || 1000000;
+  const aporte = parseInt(document.getElementById('sim-obj-aporte').value) || 0;
+  const maxAnos= parseInt(document.getElementById('sim-obj-anos').value) || 20;
+  const ipca   = parseFloat(document.getElementById('sim-obj-ipca').value) / 100;
+
+  // Portfolio weighted net yield
+  const total = P;
+  const hasAtivos = total > 0;
+  const weightedNet = hasAtivos
+    ? ativos.reduce((s,a) => s + calcNetYield(a)*(a.investedValue||0), 0) / total
+    : CDI_RATE * 0.85;
+
+  const baseRate = weightedNet / 100;
+  const consRate = Math.max(baseRate * 0.75, 0.04);
+  const otimRate = Math.min(baseRate * 1.20, 0.22);
+
+  const fmt   = v => 'R$ ' + Math.round(Math.abs(v)).toLocaleString('pt-BR');
+  const fmtK  = v => { const a=Math.abs(v),s=v<0?'−':''; return s+(a>=1e6?'R$'+(a/1e6).toFixed(2).replace('.',',')+'M':a>=1e3?'R$'+(a/1e3).toFixed(1).replace('.',',')+'k':fmt(a)); };
+  const fmtPct= v => v.toFixed(2).replace('.',',') + '%';
+
+  // Month-by-month projection → array of yearly snapshots
+  function projectYears(rate, P0, pmt, years) {
+    const m = rate / 12;
+    let v = P0, totalAportado = P0;
+    const arr = [{ year:0, nominal:Math.round(P0), aportado:Math.round(P0), juros:0, real:Math.round(P0) }];
+    for (let yr = 1; yr <= years; yr++) {
+      for (let mo = 0; mo < 12; mo++) { v = v * (1 + m) + pmt; }
+      totalAportado += pmt * 12;
+      arr.push({
+        year: yr,
+        nominal: Math.round(v),
+        aportado: Math.round(totalAportado),
+        juros: Math.round(v - totalAportado),
+        real: Math.round(v / Math.pow(1 + ipca, yr))
+      });
+    }
+    return arr;
+  }
+
+  const baseData = projectYears(baseRate, P, aporte, maxAnos);
+  const consData = projectYears(consRate, P, aporte, maxAnos);
+  const otimData = projectYears(otimRate, P, aporte, maxAnos);
+
+  // Time to goal (months)
+  function monthsToGoal(rate, P0, pmt, target) {
+    const m = rate / 12;
+    let v = P0, mo = 0;
+    while (v < target && mo < 600) { v = v * (1 + m) + pmt; mo++; }
+    return v >= target ? mo : null;
+  }
+
+  // Required PMT to hit goal in maxAnos with base rate
+  function requiredPMT(rate, P0, target, years) {
+    const n = years * 12, m = rate / 12;
+    const fvP = P0 * Math.pow(1 + m, n);
+    if (fvP >= target) return 0;
+    return (target - fvP) * m / (Math.pow(1 + m, n) - 1);
+  }
+
+  const baseMo = monthsToGoal(baseRate, P, aporte, FV);
+  const consMo = monthsToGoal(consRate, P, aporte, FV);
+  const otimMo = monthsToGoal(otimRate, P, aporte, FV);
+  const reqPMT = requiredPMT(baseRate, P, FV, maxAnos);
+
+  const toYears = mo => mo ? (mo/12).toFixed(1).replace('.',',') + ' anos' : '> ' + maxAnos + ' anos';
+
+  const finalBase = baseData[maxAnos].nominal;
+  const finalReal = baseData[maxAnos].real;
+  const totalAportado = P + aporte * maxAnos * 12;
+  const juros = Math.max(0, finalBase - totalAportado);
+
+  // ── KPI Grid ──
+  const kpisEl = document.getElementById('sim-obj-kpis');
+  document.getElementById('sim-obj-placeholder').style.display = 'none';
+  kpisEl.style.display = '';
+  kpisEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Tempo até meta (base)</div>
+        <div class="sim-kpi-val" style="color:var(--green)">${toYears(baseMo)}</div>
+        <div class="sim-kpi-sub">meta: ${fmtK(FV)}</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Aporte mensal necessário</div>
+        <div class="sim-kpi-val" style="color:${reqPMT>0?'var(--amber)':'var(--green)'}">${reqPMT > 0 ? fmt(reqPMT) : 'Meta atingível'}</div>
+        <div class="sim-kpi-sub">para atingir em ${maxAnos} anos</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Patrimônio em ${maxAnos} anos (nominal)</div>
+        <div class="sim-kpi-val" style="color:var(--green)">${fmtK(finalBase)}</div>
+        <div class="sim-kpi-sub">taxa base ${fmtPct(weightedNet)} a.a.</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Patrimônio em ${maxAnos} anos (real)</div>
+        <div class="sim-kpi-val">${fmtK(finalReal)}</div>
+        <div class="sim-kpi-sub">deflacionado IPCA ${fmtPct(ipca*100)}</div>
+      </div>
+    </div>`;
+
+  // ── Resumo por Cenário ──
+  const resultEl = document.getElementById('sim-obj-resultado');
+  resultEl.style.display = '';
+  resultEl.innerHTML = `
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Resumo por Cenário</div>
+      <div class="sim-info-row"><span class="sim-info-label">🚀 Otimista (+20% na taxa · ${fmtPct(otimRate*100)} a.a.)</span><span class="sim-info-val" style="color:var(--green)">${toYears(otimMo)}</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">📊 Base (carteira atual · ${fmtPct(weightedNet)} a.a.)</span><span class="sim-info-val">${toYears(baseMo)}</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">🛡️ Conservador (−25% na taxa · ${fmtPct(consRate*100)} a.a.)</span><span class="sim-info-val" style="color:var(--amber)">${toYears(consMo)}</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">Total aportado (${maxAnos} anos)</span><span class="sim-info-val">${fmtK(totalAportado)}</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">Juros compostos gerados (base)</span><span class="sim-info-val" style="color:var(--green)">${fmtK(juros)}</span></div>
+      <div class="sim-info-row" style="border:none"><span class="sim-info-label">Renda passiva mensal estimada</span><span class="sim-info-val" style="color:var(--green)">${fmt(finalBase * baseRate / 12 * 0.85)}</span></div>
+    </div>`;
+
+  // ── Show charts section ──
+  document.getElementById('sim-obj-charts-wrap').style.display = '';
+
+  // Evolution chart
+  const labels = Array.from({length:maxAnos+1}, (_,i) => i===0?'Hoje':i+'a');
+  _makeSimChart('sim-chart-evolution', {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Otimista',   data:otimData.map(d=>d.nominal), borderColor:'#00d4aa',               backgroundColor:'rgba(0,212,170,.06)', borderWidth:2,   fill:true,  tension:0.4, pointRadius:0 },
+      { label:'Base',       data:baseData.map(d=>d.nominal), borderColor:'rgba(148,163,184,.8)',  backgroundColor:'transparent',          borderWidth:2.5, fill:false, tension:0.4, pointRadius:0 },
+      { label:'Conserv.',   data:consData.map(d=>d.nominal), borderColor:'rgba(245,158,11,.65)',  backgroundColor:'transparent',          borderWidth:1.5, fill:false, tension:0.4, pointRadius:0, borderDash:[5,5] },
+      { label:'Real (base)',data:baseData.map(d=>d.real),    borderColor:'rgba(148,163,184,.28)', backgroundColor:'transparent',          borderWidth:1,   fill:false, tension:0.4, pointRadius:0, borderDash:[2,4] },
+      { label:'Meta',       data:Array(maxAnos+1).fill(FV),  borderColor:'rgba(239,68,68,.55)',   backgroundColor:'transparent',          borderWidth:1.5, fill:false, pointRadius:0, borderDash:[6,3] },
+    ]},
+    options: chartDefaults({ y:{ ticks:{callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'k':'0',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}}, x:{ticks:{color:'#475569',font:{size:10},maxTicksLimit:12},grid:{display:false},border:{display:false}} })
+  });
+
+  // Composition (stacked bar)
+  _makeSimChart('sim-chart-composition', {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label:'Capital inicial', data:Array(maxAnos+1).fill(P),                              backgroundColor:'rgba(148,163,184,.18)', stack:'s' },
+      { label:'Aportes',         data:baseData.map((d,i)=>i===0?0:Math.max(0,d.aportado-P)),backgroundColor:'rgba(59,130,246,.5)',   stack:'s' },
+      { label:'Rendimentos',     data:baseData.map(d=>Math.max(0,d.juros)),                  backgroundColor:'rgba(0,212,170,.65)',   stack:'s' },
+    ]},
+    options: chartDefaults({ y:{ticks:{callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'k':'0',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}}, x:{ticks:{color:'#475569',font:{size:10},maxTicksLimit:12},grid:{display:false},border:{display:false}} })
+  });
+
+  // Stress scenarios
+  _simDrawStress(P, baseRate, aporte, maxAnos, fmt, fmtK);
+
+  // Efficiency score
+  _simDrawEfficiency(ativos, weightedNet);
+
+  // Year-by-year table
+  _simDrawObjTable(baseData, consData, otimData, FV, fmtK);
+}
+
+function _simDrawStress(P, baseRate, aporte, years, fmt, fmtK) {
+  const el = document.getElementById('sim-stress-items');
+  if (!el) return;
+
+  // Stress 1: Bear market -30% first year
+  function projectFinal(rate, P0, pmt, yrs) {
+    const m = rate/12; let v=P0;
+    for(let y=0;y<yrs;y++) for(let mo=0;mo<12;mo++) v=v*(1+m)+pmt;
+    return v;
+  }
+  const vBase = projectFinal(baseRate, P, aporte, years);
+  const vBear = projectFinal(baseRate, P*0.70, aporte, years);
+  const vDrop = projectFinal(Math.max(baseRate-0.03,0.04), P, aporte, years);
+  const realBase  = vBase / Math.pow(1+IPCA_RATE/100, years);
+  const realSpike = vBase / Math.pow(1+IPCA_RATE/100*2, years);
+
+  const row = (icon, bg, title, sub, val, valColor, vsub) => `
+    <div class="sim-stress-item">
+      <div class="sim-stress-icon" style="background:${bg}">${icon}</div>
+      <div class="sim-stress-info">
+        <div class="sim-stress-title">${title}</div>
+        <div class="sim-stress-sub">${sub}</div>
+      </div>
+      <div class="sim-stress-result">
+        <div class="sim-stress-val" style="color:${valColor}">${val}</div>
+        <div class="sim-stress-vsub">${vsub}</div>
+      </div>
+    </div>`;
+
+  el.innerHTML =
+    row('🐻','rgba(239,68,68,.1)','Bear Market (−30% no 1º ano)','Queda de 30% logo no início, seguida de recuperação normal.',
+        fmtK(Math.abs(vBear-vBase))+' a menos','#ef4444','vs. cenário base') +
+    row('📉','rgba(245,158,11,.1)','Queda de Juros (CDI −3 p.p.)','Taxa de referência recua 3 pp e permanece até o fim.',
+        fmtK(Math.abs(vBase-vDrop))+' a menos','var(--amber)','vs. cenário base') +
+    row('🌡️','rgba(139,92,246,.1)','Hiperinflação (IPCA ×2)','Inflação dobra — impacto no poder de compra real.',
+        fmtK(Math.abs(realBase-realSpike))+' a menos (real)','var(--purple)','poder de compra');
+}
+
+function _simDrawEfficiency(ativos, weightedNet) {
+  const elScore = document.getElementById('sim-efficiency-score');
+  const elSugs  = document.getElementById('sim-suggestions');
+  if (!elScore) return;
+
+  const n = ativos.length;
+  const diversScore  = Math.min(100, n <= 1 ? 25 : n === 2 ? 50 : n === 3 ? 70 : n === 4 ? 85 : 100);
+  const taxPct       = n > 0 ? ativos.filter(a=>a.irExempt).length / n : 0;
+  const taxScore     = Math.round(Math.min(100, taxPct * 200 + 20));
+  const fgcPct       = n > 0 ? ativos.filter(a=>a.garantia==='FGC').length / n : 0;
+  const fgcScore     = Math.round(Math.min(100, fgcPct * 100));
+  const yieldScore   = Math.round(Math.min(100, (weightedNet / CDI_RATE) * 85));
+  const overall      = Math.round(diversScore*0.25 + taxScore*0.20 + fgcScore*0.15 + yieldScore*0.40);
+  const scoreColor   = overall >= 80 ? 'var(--green)' : overall >= 60 ? 'var(--amber)' : '#ef4444';
+  const scoreLabel   = overall >= 80 ? 'Excelente' : overall >= 70 ? 'Boa' : overall >= 55 ? 'Regular' : 'Fraca';
+
+  const circ = 2 * Math.PI * 32;
+  elScore.innerHTML = `
+    <div class="sim-score-ring">
+      <svg width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0">
+        <circle cx="40" cy="40" r="32" fill="none" stroke="var(--border2)" stroke-width="7"/>
+        <circle cx="40" cy="40" r="32" fill="none" stroke="${scoreColor}" stroke-width="7"
+          stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ*(1-overall/100)).toFixed(1)}"
+          stroke-linecap="round" transform="rotate(-90 40 40)"/>
+      </svg>
+      <div>
+        <div style="font-size:26px;font-weight:800;font-family:'DM Mono',monospace;color:${scoreColor}">${overall}<span style="font-size:13px;color:var(--txt3)">/100</span></div>
+        <div style="font-size:12px;color:var(--txt2);margin-top:1px">${scoreLabel}</div>
+      </div>
+    </div>
+    <div class="sim-metrics-grid">
+      ${[['Diversificação',diversScore],['Efic. fiscal',taxScore],['Proteção FGC',fgcScore],['Retorno vs CDI',yieldScore]].map(([l,s])=>`
+        <div class="sim-metric-box">
+          <div class="sim-metric-lbl">${l}</div>
+          <div class="sim-metric-val" style="color:${s>=70?'var(--green)':s>=50?'var(--amber)':'#ef4444'}">${s}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // Suggestions
+  const sugs = [];
+  if (n < 3) sugs.push({i:'🌐', t:'Diversifique para ao menos 3–4 ativos diferentes para reduzir concentração de emissor.'});
+  if (taxScore < 30) sugs.push({i:'💸', t:'Inclua LCI, LCA ou debêntures incentivadas para melhorar a eficiência fiscal da carteira.'});
+  if (weightedNet < CDI_RATE * 0.95) sugs.push({i:'📈', t:'Taxa atual abaixo de 95% CDI. Avalie CDBs de bancos médios com melhor remuneração.'});
+  if (fgcScore < 50) sugs.push({i:'🛡️', t:'Aumente a parcela coberta pelo FGC para maior proteção do principal.'});
+  if (sugs.length === 0) sugs.push({i:'✅', t:'Carteira bem estruturada. Revise o rebalanceamento semestralmente.'});
+
+  if (elSugs) elSugs.innerHTML = sugs.map(s=>`
+    <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">
+      <span style="font-size:14px;flex-shrink:0">${s.i}</span>
+      <span style="font-size:12px;color:var(--txt2);line-height:1.45">${s.t}</span>
+    </div>`).join('');
+}
+
+function _simDrawObjTable(baseData, consData, otimData, FV, fmtK) {
+  const el = document.getElementById('sim-obj-table');
+  if (!el) return;
+  let goalYear = null;
+  el.innerHTML = `<thead><tr>
+    <th>Ano</th><th>Otimista</th><th>Base (nominal)</th><th>Base (real)</th><th>Conservador</th><th>Rendimentos acum.</th>
+  </tr></thead><tbody>${baseData.map((d,i) => {
+    const isGoal = goalYear === null && d.nominal >= FV;
+    if (isGoal) goalYear = i;
+    return `<tr class="${isGoal?'goal-row':''}">
+      <td>${i===0?'Hoje':i+(i===1?' ano':' anos')}</td>
+      <td>${fmtK(otimData[i].nominal)}</td>
+      <td>${fmtK(d.nominal)}</td>
+      <td style="color:var(--txt3)">${fmtK(d.real)}</td>
+      <td>${fmtK(consData[i].nominal)}</td>
+      <td style="color:var(--green)">${fmtK(Math.max(0,d.juros))}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
+
+// ─────────────────────────────────────────────
+//   SIMULAÇÃO DE FASE DE RETIRADA
+// ─────────────────────────────────────────────
+function runSimRetirada() {
+  const c   = _activeCarteira || { id:'principal', profile:S.profile };
+  const cid = c.id;
+  const ativos = getAtivos(cid);
+
+  const W   = parseInt((document.getElementById('sim-ret-anual').value||'').replace(/[^\d]/g,'')) || 50000;
+  const P0  = parseInt((document.getElementById('sim-ret-patrimonio').value||'').replace(/[^\d]/g,''))
+              || ativos.reduce((s,a)=>s+(a.investedValue||0),0);
+  const anos= parseInt(document.getElementById('sim-ret-anos').value) || 30;
+  const taxa= parseFloat(document.getElementById('sim-ret-taxa').value) / 100;
+  const ipca= parseFloat(document.getElementById('sim-ret-ipca').value) / 100;
+
+  const fmt  = v => 'R$ ' + Math.round(Math.abs(v)).toLocaleString('pt-BR');
+  const fmtK = v => { const a=Math.abs(v),s=v<0?'−':''; return s+(a>=1e6?'R$'+(a/1e6).toFixed(2).replace('.',',')+'M':a>=1e3?'R$'+(a/1e3).toFixed(1).replace('.',',')+'k':fmt(a)); };
+
+  const SWR_cons = 0.035, SWR_base = 0.04, SWR_otim = 0.045;
+  const patNeeded_cons = Math.round(W / SWR_cons);
+  const patNeeded_base = Math.round(W / SWR_base);
+  const patNeeded_otim = Math.round(W / SWR_otim);
+  const swrAtual = P0 > 0 ? W / P0 : 0;
+
+  // Month-by-month depletion
+  function calcDurMonths(P_init, annualW, rate, inflation, maxYrs) {
+    const r = rate / 12;
+    let v = P_init;
+    for (let mo = 0; mo < maxYrs * 12; mo++) {
+      v = v * (1 + r) - (annualW / 12) * Math.pow(1 + inflation, mo / 12);
+      if (v <= 0) return mo + 1;
+    }
+    return maxYrs * 12; // survived
+  }
+
+  // Year-by-year projection
+  function projectRet(P_init, annualW, rate, inflation, yrs) {
+    const r = rate / 12;
+    let v = P_init;
+    const arr = [{year:0, saldo:P_init, retirada:0, rendimento:0, inflW:annualW}];
+    for (let yr = 1; yr <= yrs; yr++) {
+      let rend = 0;
+      const inflW = annualW * Math.pow(1 + inflation, yr - 1);
+      for (let mo = 0; mo < 12; mo++) {
+        const rm = v * r; rend += rm;
+        v = v * (1 + r) - inflW / 12;
+        if (v < 0) { v = 0; }
+      }
+      arr.push({ year:yr, saldo:Math.max(0,Math.round(v)), retirada:Math.round(inflW), rendimento:Math.round(rend), depleted: v===0 });
+    }
+    return arr;
+  }
+
+  const baseArr = projectRet(P0, W, taxa,        ipca, anos);
+  const consArr = projectRet(P0, W, taxa * 0.80, ipca, anos);
+  const otimArr = projectRet(P0, W, taxa * 1.20, ipca, anos);
+
+  const durBase = calcDurMonths(P0, W, taxa,        ipca, 100);
+  const durCons = calcDurMonths(P0, W, taxa * 0.80, ipca, 100);
+  const durOtim = calcDurMonths(P0, W, taxa * 1.20, ipca, 100);
+
+  const durBaseYrs = durBase / 12;
+  const survivalPct = P0 >= patNeeded_base
+    ? (swrAtual <= SWR_cons ? 97 : swrAtual <= SWR_base ? 88 : 74)
+    : Math.round(Math.min(90, Math.max(15, (durBaseYrs / anos) * 80)));
+  const survColor = survivalPct >= 85 ? 'var(--green)' : survivalPct >= 65 ? 'var(--amber)' : '#ef4444';
+
+  // ── KPIs ──
+  document.getElementById('sim-ret-placeholder').style.display = 'none';
+  const kpisEl = document.getElementById('sim-ret-kpis');
+  kpisEl.style.display = '';
+  kpisEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Patrimônio necessário (4% SWR)</div>
+        <div class="sim-kpi-val" style="color:${P0>=patNeeded_base?'var(--green)':'#ef4444'}">${fmtK(patNeeded_base)}</div>
+        <div class="sim-kpi-sub">${P0>=patNeeded_base?'✅ Patrimônio suficiente':'⚠️ Déficit: '+fmtK(patNeeded_base-P0)}</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Taxa de retirada atual</div>
+        <div class="sim-kpi-val" style="color:${swrAtual<=SWR_base?'var(--green)':'#ef4444'}">${(swrAtual*100).toFixed(2).replace('.',',')}%</div>
+        <div class="sim-kpi-sub">${swrAtual<=SWR_base?'Sustentável (≤ 4%)':'Acima da taxa segura'}</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Duração estimada</div>
+        <div class="sim-kpi-val" style="color:${durBaseYrs*12>=anos*12*0.95?'var(--green)':'var(--amber)'}">${durBaseYrs >= 100 ? '> 100 anos' : durBaseYrs.toFixed(1).replace('.',',') + ' anos'}</div>
+        <div class="sim-kpi-sub">cenário base · horizonte: ${anos} anos</div>
+      </div>
+      <div class="sim-kpi">
+        <div class="sim-kpi-label">Probabilidade de sobrevivência</div>
+        <div class="sim-kpi-val" style="color:${survColor}">${survivalPct}%</div>
+        <div class="sim-kpi-sub">${survivalPct>=85?'Alta sustentabilidade':survivalPct>=65?'Moderada':'Atenção requerida'}</div>
+      </div>
+    </div>`;
+
+  // ── Resultado ──
+  const resultEl = document.getElementById('sim-ret-resultado');
+  resultEl.style.display = '';
+  resultEl.innerHTML = `
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Análise por Taxa de Retirada (SWR)</div>
+      <div class="sim-info-row"><span class="sim-info-label">🛡️ Conservador — 3,5% a.a.</span><span class="sim-info-val">${fmtK(patNeeded_cons)} necessários</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">📊 Base — 4,0% a.a. (Trinity Study)</span><span class="sim-info-val">${fmtK(patNeeded_base)} necessários</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">🚀 Agressivo — 4,5% a.a.</span><span class="sim-info-val">${fmtK(patNeeded_otim)} necessários</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">Retirada corrigida pelo IPCA (ano ${anos})</span><span class="sim-info-val">${fmt(W * Math.pow(1+ipca, anos))}</span></div>
+      <div class="sim-info-row"><span class="sim-info-label">Renda passiva mensal equivalente</span><span class="sim-info-val" style="color:var(--green)">${fmt(W/12)}</span></div>
+      <div class="sim-info-row" style="border:none"><span class="sim-info-label">Duração (cenário conservador)</span><span class="sim-info-val">${durCons/12>=100?'> 100 anos':(durCons/12).toFixed(1).replace('.',',')+' anos'}</span></div>
+    </div>`;
+
+  // ── Charts ──
+  document.getElementById('sim-ret-charts-wrap').style.display = '';
+  const labels = baseArr.map(d => d.year===0?'Hoje':d.year+'a');
+
+  _makeSimChart('sim-chart-retirada', {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Taxa cons.',  data:consArr.map(d=>d.saldo), borderColor:'#00d4aa',             backgroundColor:'rgba(0,212,170,.05)', borderWidth:2,   fill:true,  tension:0.4, pointRadius:0 },
+      { label:'Base',        data:baseArr.map(d=>d.saldo), borderColor:'rgba(148,163,184,.8)',backgroundColor:'transparent',          borderWidth:2.5, fill:false, tension:0.4, pointRadius:0 },
+      { label:'Taxa agressiva',data:otimArr.map(d=>d.saldo),borderColor:'rgba(245,158,11,.65)',backgroundColor:'transparent',          borderWidth:1.5, fill:false, tension:0.4, pointRadius:0, borderDash:[5,5] },
+    ]},
+    options: chartDefaults({ y:{ticks:{callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+(v/1e3).toFixed(0)+'k':'0',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}}, x:{ticks:{color:'#475569',font:{size:10},maxTicksLimit:12},grid:{display:false},border:{display:false}} })
+  });
+
+  // ── Stress (retirada) ──
+  const sEl = document.getElementById('sim-ret-stress');
+  if (sEl) {
+    const dBear  = calcDurMonths(P0*0.70, W, taxa, ipca, 100) / 12;
+    const dDrop  = calcDurMonths(P0, W, Math.max(taxa-0.03,0.03), ipca, 100) / 12;
+    const dSpike = calcDurMonths(P0, W, taxa, ipca*2, 100) / 12;
+    const durStr = d => d >= 100 ? 'Sustentável' : d.toFixed(0)+' anos';
+    const durCol = (d,ref) => d >= ref ? 'var(--green)' : d >= ref*0.7 ? 'var(--amber)' : '#ef4444';
+    const row = (icon,bg,title,sub,d) => `
+      <div class="sim-stress-item">
+        <div class="sim-stress-icon" style="background:${bg}">${icon}</div>
+        <div class="sim-stress-info"><div class="sim-stress-title">${title}</div><div class="sim-stress-sub">${sub}</div></div>
+        <div class="sim-stress-result"><div class="sim-stress-val" style="color:${durCol(d,anos)}">${durStr(d)}</div><div class="sim-stress-vsub">duração estimada</div></div>
+      </div>`;
+    sEl.innerHTML =
+      row('🐻','rgba(239,68,68,.1)','Queda inicial de 30%','Patrimônio sofre perda de 30% no início da fase de retirada.',dBear)+
+      row('📉','rgba(245,158,11,.1)','Queda de juros (−3 p.p.)','Rentabilidade da carteira recua 3 pontos percentuais.',dDrop)+
+      row('🌡️','rgba(139,92,246,.1)','IPCA dobrado','Inflação dobra — retiradas crescem mais rápido.',dSpike);
+  }
+
+  // ── Alocação ideal ──
+  const aEl = document.getElementById('sim-ret-alocacao');
+  if (aEl) aEl.innerHTML = [
+    ['🟢','Renda fixa pós-fixada (liquidez)','40–50%'],
+    ['🟡','IPCA+ / pré-fixado longo','25–35%'],
+    ['🟣','Isentos (LCI/LCA/Debêntures)','15–20%'],
+    ['🔵','Reserva liquidez imediata D+1','5–10%'],
+  ].map(([ic,lb,vl])=>`<div class="sim-info-row" style="font-size:12px"><span class="sim-info-label">${ic}&nbsp;${lb}</span><span class="sim-info-val">${vl}</span></div>`).join('');
+
+  // ── Tabela ano a ano ──
+  const tEl = document.getElementById('sim-ret-table');
+  if (tEl) {
+    tEl.innerHTML = `<thead><tr>
+      <th>Ano</th><th>Saldo (base)</th><th>Saldo (cons.)</th><th>Saldo (agressivo)</th><th>Retirada (corrig.)</th><th>Rendimento anual</th>
+    </tr></thead><tbody>${baseArr.map((d,i) => `<tr class="${d.depleted?'goal-row':''}">
+      <td>${i===0?'Hoje':i+(i===1?' ano':' anos')}</td>
+      <td style="${d.saldo===0?'color:#ef4444':''}">${fmtK(d.saldo)}</td>
+      <td>${fmtK(consArr[i]?.saldo||0)}</td>
+      <td>${fmtK(otimArr[i]?.saldo||0)}</td>
+      <td style="color:var(--amber)">${i===0?'—':fmtK(d.retirada)}</td>
+      <td style="color:var(--green)">${i===0?'—':fmtK(d.rendimento)}</td>
+    </tr>`).join('')}</tbody>`;
+  }
 }
 
 // ══════════════════ SAÚDE ══════════════════
