@@ -368,6 +368,22 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .best-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);background:var(--green-dim);border-radius:3px;padding:2px 6px;margin-left:6px;vertical-align:middle}
 .cat-add-btn{background:transparent;border:1px solid var(--border2);color:var(--txt2);font-size:11px;font-weight:600;border-radius:6px;padding:5px 12px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;white-space:nowrap}
 .cat-add-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+/* ── MINHA CARTEIRA — agrupamentos ── */
+.tbl-cat-hdr td{background:rgba(148,163,184,.055)!important;padding:8px 10px;border-top:2px solid var(--border)!important}
+.tbl-cat-hdr:first-child td{border-top:none!important}
+.tbl-cat-name{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.tbl-cat-count{font-size:10px;color:var(--txt3);margin-left:7px;font-weight:400}
+.tbl-sub-hdr td{background:rgba(148,163,184,.025)!important;padding:5px 10px}
+.tbl-sub-label{font-size:11px;color:var(--txt2);padding-left:14px;font-style:italic}
+.tbl-sub-val{font-size:10px;color:var(--txt3);margin-left:7px}
+.tbl-sub-indent{padding-left:24px!important}
+.tbl-cat-total td{background:rgba(0,212,170,.04)!important;border-top:1px solid rgba(0,212,170,.15)!important;padding:8px 10px}
+.tbl-cat-total-label{font-size:11px;font-weight:700;color:var(--txt2)}
+.tbl-grand-total td{background:rgba(0,212,170,.08)!important;border-top:2px solid rgba(0,212,170,.28)!important;padding:11px 10px}
+.tbl-grand-label{font-size:12px;font-weight:800;color:var(--txt);letter-spacing:.03em;text-transform:uppercase}
+.tbl-grand-val{font-size:14px;font-weight:800;font-family:'DM Mono',monospace;color:var(--green)}
+.tbl-grand-net{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)}
+.tbl-pct-num{font-size:11px;color:var(--txt2)}
 .mine-empty{text-align:center;padding:44px 20px;color:var(--txt3)}
 .mine-empty-icon{font-size:36px;margin-bottom:14px}
 .mine-empty-title{font-size:14px;font-weight:600;color:var(--txt2);margin-bottom:6px}
@@ -1065,7 +1081,7 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
               <table class="asset-table" id="asset-table" style="min-width:680px">
                 <thead><tr>
                   <th>Ativo</th><th>Banco</th><th>Tipo</th>
-                  <th>Valor aplicado</th><th>Taxa bruta</th>
+                  <th>Valor aplicado</th><th style="text-align:center">% Cart.</th><th>Taxa bruta</th>
                   <th>Rentab. líquida</th><th>Prazo</th>
                   <th>Liquidez</th><th>Garantia</th><th></th>
                 </tr></thead>
@@ -2579,51 +2595,143 @@ function renderMinhaCarteira() {
   table.style.display = '';
 
   const total = ativos.reduce((s,a) => s + (a.investedValue || 0), 0);
-  tbody.innerHTML = ativos.map(a => {
-    const net    = calcNetYield(a);
-    const liqCls = (a.liq==='D+0'||a.liq==='D+1') ? 'tag-green' : a.liq==='No venc.' ? 'tag-amber' : 'tag-purple';
-    const garCls = a.garantia==='FGC' ? 'tag-blue' : a.garantia==='Soberano' ? 'tag-green' : 'tag-amber';
-    return `<tr>
-      <td><div class="at-name">${a.name}</div><div class="at-type">${a.type}</div></td>
-      <td><span style="display:inline-flex;align-items:center;gap:5px">
-        <span class="bank-dot" style="background:${a.bColor}"></span>
-        <span class="bank-name-sm">${a.bank}</span>
-      </span></td>
-      <td><span class="tag ${a.irExempt?'tag-green':'tag-blue'}">${a.type}</span></td>
-      <td class="mono">R$&nbsp;${(a.investedValue||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td class="mono" style="color:var(--txt2);font-size:11px">${grossLabel(a)}</td>
-      <td><span class="mono ${yieldCls(net)}" style="font-weight:700">${fmtYield(net)}</span>${a.irExempt?'<span class="tag tag-green" style="margin-left:5px;font-size:9px">IR isento</span>':''}</td>
-      <td class="mono" style="font-size:11px;color:var(--txt2)">${a.prazo}</td>
-      <td><span class="tag ${liqCls}">${a.liq}</span></td>
-      <td><span class="tag ${garCls}">${a.garantia}</span></td>
-      <td><button class="del-ativo-btn" onclick="removeAtivo('${cid}','${a.uid}')" title="Remover">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-      </button></td>
-    </tr>`;
-  }).join('');
 
-  // Donut de distribuição por valor
+  // ── Grouping helpers ──
+  const CAT_ORDER  = ['CDB','LCI','LCA','LC','LIG','Tesouro Selic','Tesouro IPCA+','Tesouro Pré','Debênture','CRI','CRA'];
+  const SUB_LABELS = {'CDI%':'Pós-fixado CDI','SELIC%':'Pós-fixado Selic','IPCA+':'Inflação IPCA+','PRE':'Prefixado'};
+  const R = (v,d=2) => v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+  // Group by type
+  const byType = {};
+  for (const a of ativos) {
+    const cat = a.type || 'Outro';
+    if (!byType[cat]) byType[cat] = [];
+    byType[cat].push(a);
+  }
+  const cats = Object.keys(byType).sort((a,b) => {
+    const ai = CAT_ORDER.indexOf(a), bi = CAT_ORDER.indexOf(b);
+    if (ai<0 && bi<0) return a.localeCompare(b);
+    if (ai<0) return 1; if (bi<0) return -1;
+    return ai - bi;
+  });
+
+  const NCOLS = 11;
+  let rows = '';
+
+  for (const cat of cats) {
+    const items    = byType[cat];
+    const catTotal = items.reduce((s,a) => s + (a.investedValue||0), 0);
+    const catPct   = total > 0 ? (catTotal/total*100) : 0;
+    const catNetAvg= catTotal > 0
+      ? items.reduce((s,a) => s + calcNetYield(a)*(a.investedValue||0), 0) / catTotal : 0;
+
+    // ── Category header ──
+    rows += `<tr class="tbl-cat-hdr">
+      <td colspan="${NCOLS}">
+        <span class="tbl-cat-name">${cat}</span>
+        <span class="tbl-cat-count">${items.length} ativo${items.length>1?'s':''}</span>
+      </td>
+    </tr>`;
+
+    // Group by rateType within category
+    const bySub = {};
+    for (const a of items) { const s = a.rateType||'Outro'; if (!bySub[s]) bySub[s]=[]; bySub[s].push(a); }
+    const subs     = Object.keys(bySub);
+    const multiSub = subs.length > 1;
+
+    for (const sub of subs) {
+      const subItems = bySub[sub];
+      const subTotal = subItems.reduce((s,a) => s + (a.investedValue||0), 0);
+      const subPct   = total > 0 ? (subTotal/total*100) : 0;
+      const subLabel = SUB_LABELS[sub] || sub;
+
+      // ── Subcategory header (only when multiple rateTypes exist) ──
+      if (multiSub) {
+        rows += `<tr class="tbl-sub-hdr">
+          <td colspan="${NCOLS}">
+            <span class="tbl-sub-label">${subLabel}</span>
+            <span class="tbl-sub-val">${subPct.toFixed(1)}% da carteira · R$&nbsp;${Math.round(subTotal).toLocaleString('pt-BR')}</span>
+          </td>
+        </tr>`;
+      }
+
+      // ── Asset rows ──
+      for (const a of subItems) {
+        const net    = calcNetYield(a);
+        const pct    = total > 0 ? (a.investedValue/total*100) : 0;
+        const liqCls = (a.liq==='D+0'||a.liq==='D+1') ? 'tag-green' : a.liq==='No venc.' ? 'tag-amber' : 'tag-purple';
+        const garCls = a.garantia==='FGC' ? 'tag-blue' : a.garantia==='Soberano' ? 'tag-green' : 'tag-amber';
+        const indent = multiSub ? ' tbl-sub-indent' : '';
+        rows += `<tr>
+          <td class="${indent}"><div class="at-name">${a.name}</div><div class="at-type">${a.type}</div></td>
+          <td><span style="display:inline-flex;align-items:center;gap:5px">
+            <span class="bank-dot" style="background:${a.bColor}"></span>
+            <span class="bank-name-sm">${a.bank}</span>
+          </span></td>
+          <td><span class="tag ${a.irExempt?'tag-green':'tag-blue'}">${a.type}</span></td>
+          <td class="mono">R$&nbsp;${R(a.investedValue||0)}</td>
+          <td class="tbl-pct-num" style="text-align:center">${pct.toFixed(1)}%</td>
+          <td class="mono" style="color:var(--txt2);font-size:11px">${grossLabel(a)}</td>
+          <td><span class="mono ${yieldCls(net)}" style="font-weight:700">${fmtYield(net)}</span>${a.irExempt?'<span class="tag tag-green" style="margin-left:5px;font-size:9px">IR isento</span>':''}</td>
+          <td class="mono" style="font-size:11px;color:var(--txt2)">${a.prazo}</td>
+          <td><span class="tag ${liqCls}">${a.liq}</span></td>
+          <td><span class="tag ${garCls}">${a.garantia}</span></td>
+          <td><button class="del-ativo-btn" onclick="removeAtivo('${cid}','${a.uid}')" title="Remover">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button></td>
+        </tr>`;
+      }
+    }
+
+    // ── Category subtotal (shown when >1 category) ──
+    if (cats.length > 1) {
+      rows += `<tr class="tbl-cat-total">
+        <td colspan="3"><span class="tbl-cat-total-label">Subtotal ${cat}</span></td>
+        <td class="mono" style="font-weight:700;color:var(--txt)">R$&nbsp;${R(catTotal)}</td>
+        <td class="tbl-pct-num" style="text-align:center;font-weight:700;color:var(--txt2)">${catPct.toFixed(1)}%</td>
+        <td></td>
+        <td><span class="mono" style="font-weight:700;color:var(--green)">${fmtYield(catNetAvg)}</span></td>
+        <td colspan="4"></td>
+      </tr>`;
+    }
+  }
+
+  // ── Grand total ──
+  const grandNetAvg = total > 0
+    ? ativos.reduce((s,a) => s + calcNetYield(a)*(a.investedValue||0), 0) / total : 0;
+  rows += `<tr class="tbl-grand-total">
+    <td colspan="3"><span class="tbl-grand-label">Total da Carteira</span></td>
+    <td class="mono tbl-grand-val">R$&nbsp;${R(total)}</td>
+    <td style="text-align:center;font-size:12px;font-weight:800;color:var(--green)">100%</td>
+    <td></td>
+    <td class="mono tbl-grand-net">${fmtYield(grandNetAvg)}</td>
+    <td colspan="4"></td>
+  </tr>`;
+
+  tbody.innerHTML = rows;
+
+  // ── Donut — grouped by category ──
   if (total > 0) {
     const el = document.getElementById('chartAllocCart');
     if (el) {
       Chart.getChart(el)?.destroy();
-      const bgColors = ativos.map((_,i) => COLORS[i % COLORS.length]);
-      const data     = ativos.map(a => +(a.investedValue/total*100).toFixed(1));
+      const catData  = cats.map(c => byType[c].reduce((s,a) => s + (a.investedValue||0), 0));
+      const bgColors = cats.map((_,i) => COLORS[i % COLORS.length]);
+      const data     = catData.map(v => +(v/total*100).toFixed(1));
       new Chart(el.getContext('2d'), {
         type:'doughnut',
-        data:{labels:ativos.map(a=>a.name.split(' ').slice(0,3).join(' ')),
-              datasets:[{data,backgroundColor:bgColors,borderColor:'rgba(0,0,0,0)',borderWidth:0,hoverOffset:4}]},
+        data:{labels:cats,datasets:[{data,backgroundColor:bgColors,borderColor:'rgba(0,0,0,0)',borderWidth:0,hoverOffset:4}]},
         options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
           plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.toFixed(1)+'%'},
           backgroundColor:'#0f1421',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'rgba(148,163,184,.15)',borderWidth:1,padding:10}}}
       });
-      document.getElementById('alloc-legend-2').innerHTML = ativos.map((a,i)=>`
+      document.getElementById('alloc-legend-2').innerHTML = cats.map((c,i)=>`
         <div class="alloc-row">
           <div class="alloc-dot" style="background:${bgColors[i]}"></div>
-          <div class="alloc-name">${a.name.split(' ').slice(0,3).join(' ')}</div>
+          <div class="alloc-name">${c}</div>
           <div class="alloc-pct">${data[i]}%</div>
           <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${data[i]}%;background:${bgColors[i]}"></div></div>
-          <div class="alloc-val">R$&nbsp;${Math.round(a.investedValue).toLocaleString('pt-BR')}</div>
+          <div class="alloc-val">R$&nbsp;${Math.round(catData[i]).toLocaleString('pt-BR')}</div>
         </div>`).join('');
     }
   }
