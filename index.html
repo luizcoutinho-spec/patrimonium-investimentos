@@ -1004,22 +1004,22 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
             <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
           <div class="kpi fade-up-2">
-            <div class="kpi-label">Rentabilidade — Mês</div>
-            <div class="kpi-value" style="color:var(--green)" id="kpi-rent">0,00%</div>
-            <div class="kpi-sub" id="kpi-rent-sub"><span class="up">—</span>&nbsp;vs CDI mês</div>
+            <div class="kpi-label">Rentabilidade Diária</div>
+            <div class="kpi-value" style="color:var(--green)" id="kpi-rent">—</div>
+            <div class="kpi-sub" id="kpi-rent-sub">R$/dia estimado</div>
             <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
           <div class="kpi fade-up-3">
-            <div class="kpi-label">Rent. Líquida Anual</div>
+            <div class="kpi-label">Rentabilidade Mensal</div>
             <div class="kpi-value" style="color:var(--green)" id="kpi-real">—</div>
-            <div class="kpi-sub" id="kpi-real-sub">Média ponderada dos ativos</div>
-            <div class="kpi-accent" style="background:var(--purple)"></div>
+            <div class="kpi-sub" id="kpi-real-sub">R$/mês estimado</div>
+            <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
           <div class="kpi fade-up-3">
-            <div class="kpi-label">Score de Saúde</div>
-            <div class="kpi-value" style="color:var(--amber)" id="kpi-score">—</div>
-            <div class="kpi-sub" id="kpi-score-sub"><span class="up">—</span></div>
-            <div class="kpi-accent" style="background:var(--amber)"></div>
+            <div class="kpi-label">Rentabilidade Anual</div>
+            <div class="kpi-value" style="color:var(--green)" id="kpi-score">—</div>
+            <div class="kpi-sub" id="kpi-score-sub">R$/ano estimado</div>
+            <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
         </div>
 
@@ -1566,16 +1566,24 @@ function refreshDashboard() {
   const scoreColor = score >= 85 ? 'var(--green)' : score >= 70 ? 'var(--amber)' : 'var(--red)';
 
   // ── KPIs ──
+  const fmtBRL = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dailyR  = hasAtivos ? baseRef * weightedNetYield/100/365 : 0;
+  const monthR  = hasAtivos ? baseRef * weightedNetYield/100/12  : 0;
+  const yearR   = hasAtivos ? baseRef * weightedNetYield/100     : 0;
+  const dailyPct = hasAtivos ? (Math.pow(1+weightedNetYield/100,1/365)-1)*100 : 0;
+
   refreshPatrimonioKpi(false);
-  const monthGain = baseRef * monthlyYield / 100;
   const $ = id => document.getElementById(id);
-  if ($('kpi-pat-sub'))   $('kpi-pat-sub').innerHTML   = `<span class="up">↑ +R$&nbsp;${Math.round(monthGain).toLocaleString('pt-BR')}</span>&nbsp;estimado/mês`;
-  if ($('kpi-rent'))      $('kpi-rent').textContent    = monthlyYield.toFixed(2).replace('.',',') + '%';
-  if ($('kpi-rent-sub'))  $('kpi-rent-sub').innerHTML  = `<span class="${diffVsCdi>=0?'up':'down'}">${diffVsCdi>=0?'+':''}${diffVsCdi.toFixed(3).replace('.',',')}%</span>&nbsp;vs CDI mês`;
-  if ($('kpi-real'))      $('kpi-real').textContent    = hasAtivos ? weightedNetYield.toFixed(2).replace('.',',')+'% a.a.' : '—';
-  if ($('kpi-real-sub'))  $('kpi-real-sub').innerHTML  = hasAtivos ? `vs CDI: <span style="color:var(--txt2)">${CDI_RATE.toFixed(2).replace('.',',')}% a.a.</span>` : 'Média ponderada dos ativos';
-  if ($('kpi-score'))     { $('kpi-score').textContent = hasAtivos ? score : '—'; $('kpi-score').style.color = scoreColor; }
-  if ($('kpi-score-sub')) $('kpi-score-sub').innerHTML = hasAtivos ? `<span class="${score>=70?'up':''}">${scoreLbl}</span>&nbsp;— ${score}/100` : '<span>—</span>';
+  if ($('kpi-pat-sub'))   $('kpi-pat-sub').innerHTML  = hasAtivos ? `<span class="up">↑ ${fmtBRL(monthR)}</span>&nbsp;estimado/mês` : '<span>—</span>';
+  // Diária
+  if ($('kpi-rent'))      $('kpi-rent').textContent   = hasAtivos ? fmtBRL(dailyR) : '—';
+  if ($('kpi-rent-sub'))  $('kpi-rent-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${dailyPct.toFixed(4).replace('.',',')}%&nbsp;/&nbsp;dia · ${weightedNetYield.toFixed(2).replace('.',',')}% a.a.</span>` : 'R$/dia estimado';
+  // Mensal
+  if ($('kpi-real'))      $('kpi-real').textContent   = hasAtivos ? fmtBRL(monthR) : '—';
+  if ($('kpi-real-sub'))  $('kpi-real-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${monthlyYield.toFixed(2).replace('.',',')}%&nbsp;/&nbsp;mês</span>` : 'R$/mês estimado';
+  // Anual
+  if ($('kpi-score'))     { $('kpi-score').textContent = hasAtivos ? fmtBRL(yearR) : '—'; $('kpi-score').style.color = 'var(--green)'; }
+  if ($('kpi-score-sub')) $('kpi-score-sub').innerHTML = hasAtivos ? `<span style="color:var(--txt3)">${weightedNetYield.toFixed(2).replace('.',',')}%&nbsp;a.a. líq.</span>` : 'R$/ano estimado';
 
   // ── Evolução patrimonial (12 meses projetados retroativamente) ──
   const months12 = ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
@@ -1976,29 +1984,36 @@ function initCwsDashboard() {
   const rendMes    = Math.round(total * monthlyYield / 100);
 
   // ── KPIs ──
+  const fmtB  = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dayR  = hasAtivos ? total * weightedNet/100/365 : 0;
+  const monR  = hasAtivos ? total * weightedNet/100/12  : 0;
+  const yrR   = hasAtivos ? total * weightedNet/100     : 0;
+  const dayPct= hasAtivos ? (Math.pow(1+weightedNet/100,1/365)-1)*100 : 0;
+  const monPct= hasAtivos ? (Math.pow(1+weightedNet/100,1/12)-1)*100  : 0;
+
   document.getElementById('cws-kpis').innerHTML = `
     <div class="kpi fade-up">
-      <div class="kpi-label">Investido nesta carteira</div>
+      <div class="kpi-label">Investido na Carteira</div>
       <div class="kpi-value" style="color:var(--txt)">${hasAtivos ? total.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}) : 'R$ 0'}</div>
-      <div class="kpi-sub">${ativos.length} ativo${ativos.length!==1?'s':''} registrado${ativos.length!==1?'s':''}</div>
+      <div class="kpi-sub">${ativos.length} ativo${ativos.length!==1?'s':''} · ${hasAtivos ? weightedNet.toFixed(2).replace('.',',')+' % a.a. líq.' : 'sem ativos'}</div>
       <div class="kpi-accent" style="background:var(--green)"></div>
     </div>
     <div class="kpi fade-up-2">
-      <div class="kpi-label">Renda Estimada / Mês</div>
-      <div class="kpi-value" style="color:var(--green)">${hasAtivos ? rendMes.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}) : '—'}</div>
-      <div class="kpi-sub">${hasAtivos ? 'Yield médio líq: '+weightedNet.toFixed(2).replace('.',',')+' % a.a.' : 'Adicione ativos para calcular'}</div>
+      <div class="kpi-label">Rentabilidade Diária</div>
+      <div class="kpi-value" style="color:var(--green)">${hasAtivos ? fmtB(dayR) : '—'}</div>
+      <div class="kpi-sub"><span style="color:var(--txt3)">${hasAtivos ? dayPct.toFixed(4).replace('.',',')+' % / dia' : 'R$/dia estimado'}</span></div>
       <div class="kpi-accent" style="background:var(--green)"></div>
     </div>
     <div class="kpi fade-up-3">
-      <div class="kpi-label">Perfil</div>
-      <div class="kpi-value" style="color:var(--purple);font-size:20px">${profLabel}</div>
-      <div class="kpi-sub">${hasAtivos ? weightedNet.toFixed(2).replace('.',',')+' % a.a. líq. médio' : 'Sem ativos registrados'}</div>
-      <div class="kpi-accent" style="background:var(--purple)"></div>
+      <div class="kpi-label">Rentabilidade Mensal</div>
+      <div class="kpi-value" style="color:var(--green)">${hasAtivos ? fmtB(monR) : '—'}</div>
+      <div class="kpi-sub"><span style="color:var(--txt3)">${hasAtivos ? monPct.toFixed(2).replace('.',',')+' % / mês' : 'R$/mês estimado'}</span></div>
+      <div class="kpi-accent" style="background:var(--green)"></div>
     </div>
     <div class="kpi fade-up-3">
-      <div class="kpi-label">Rentabilidade Diária</div>
-      <div class="kpi-value" style="color:var(--green);font-size:22px">${hasAtivos ? 'R$ '+(total*weightedNet/100/365).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</div>
-      <div class="kpi-sub">${hasAtivos ? 'R$ '+(total*weightedNet/100/12).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' / mês' : 'Adicione ativos'}</div>
+      <div class="kpi-label">Rentabilidade Anual</div>
+      <div class="kpi-value" style="color:var(--green)">${hasAtivos ? fmtB(yrR) : '—'}</div>
+      <div class="kpi-sub"><span style="color:var(--txt3)">${hasAtivos ? weightedNet.toFixed(2).replace('.',',')+' % a.a. líq.' : 'R$/ano estimado'}</span></div>
       <div class="kpi-accent" style="background:var(--green)"></div>
     </div>`;
 
