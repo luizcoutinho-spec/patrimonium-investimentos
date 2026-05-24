@@ -7,8 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --bg: #06080f;
@@ -341,22 +340,30 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 <div class="modal-overlay" id="setup-modal">
 <div class="modal-box">
   <div class="modal-title">Ativar login com Gmail</div>
-  <div class="modal-sub">O login Google usa o Firebase Authentication (gratuito). Configure em 3 passos:</div>
+  <div class="modal-sub">Configure em <strong>4 passos rápidos</strong> — leva menos de 5 minutos e é totalmente gratuito.</div>
   <div class="setup-step">
     <div class="setup-num">1</div>
-    <div class="setup-text">Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>, crie um projeto e vá em <strong>Authentication → Provedores de login → Google → Ativar</strong>.</div>
+    <div class="setup-text">Acesse <a href="https://console.cloud.google.com/apis/credentials" target="_blank">console.cloud.google.com/apis/credentials</a> e crie um projeto (ou selecione um existente).</div>
   </div>
   <div class="setup-step">
     <div class="setup-num">2</div>
-    <div class="setup-text">Em <strong>Configurações do projeto → Seus apps → Web</strong>, copie o objeto <code style="color:var(--green);font-family:'DM Mono',monospace">firebaseConfig</code> e cole abaixo:</div>
+    <div class="setup-text">Clique em <strong>Criar credenciais → ID do cliente OAuth 2.0 → Aplicativo da Web</strong>.</div>
   </div>
-  <textarea class="setup-input" id="fb-config-input" placeholder='{"apiKey":"AIza...","authDomain":"projeto.firebaseapp.com","projectId":"projeto","appId":"1:123:web:abc"}'></textarea>
   <div class="setup-step">
     <div class="setup-num">3</div>
-    <div class="setup-text">Em <strong>Authentication → Settings → Domínios autorizados</strong>, adicione: <code style="color:var(--green);font-family:'DM Mono',monospace">luizcoutinho-spec.github.io</code></div>
+    <div class="setup-text">Em <strong>"Origens JavaScript autorizadas"</strong> adicione:<br>
+      <code style="color:var(--green);font-family:'DM Mono',monospace;font-size:12px">https://luizcoutinho-spec.github.io</code>
+    </div>
   </div>
+  <div class="setup-step">
+    <div class="setup-num">4</div>
+    <div class="setup-text">Copie o <strong>ID do cliente</strong> gerado e cole abaixo:</div>
+  </div>
+  <input class="setup-input" id="gsi-client-id" type="text"
+    placeholder="000000000000-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+    style="min-height:auto;padding:13px 14px;font-size:13px;border-radius:8px;margin:4px 0 12px">
   <div class="modal-btns">
-    <button class="modal-btn-primary" onclick="saveFirebaseConfig()">Salvar e ativar</button>
+    <button class="modal-btn-primary" onclick="saveClientId()">Salvar e entrar com Google</button>
     <button class="modal-btn-ghost" onclick="closeSetupModal()">Fechar</button>
   </div>
 </div>
@@ -1484,59 +1491,32 @@ function initRebalView() {
   });
 }
 
-// ══════════════════ FIREBASE / AUTH ══════════════════
-// Para ativar o login real com Gmail, clique em
-// "Como ativar o login real com Gmail?" na tela de login.
-const FIREBASE_CONFIG = {
-  apiKey: "",        // ← cole aqui após configurar o Firebase
-  authDomain: "",
-  projectId: "",
-  appId: ""
-};
+// ══════════════════ AUTH — Google Identity Services (GIS) ══════════════════
+// Sem Firebase. Usa a biblioteca oficial do Google para OAuth em sites estáticos.
+// Para ativar: clique em "Como ativar o login real com Gmail?" na tela de login.
 
 let CURRENT_USER = null;
 
-function fbReady() {
-  const inline = FIREBASE_CONFIG.apiKey.length > 10;
-  const stored = localStorage.getItem('pat_fb_config');
-  if (inline) return FIREBASE_CONFIG;
-  if (stored) { try { return JSON.parse(stored); } catch(e){} }
-  return null;
-}
+const GOOGLE_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>`;
 
-function initFirebase(cfg) {
-  try {
-    if (!firebase.apps.length) firebase.initializeApp(cfg);
-    firebase.auth().onAuthStateChanged(handleAuthChange);
-    return true;
-  } catch(e) { return false; }
-}
-
-function handleAuthChange(user) {
-  if (user) {
-    CURRENT_USER = { name: user.displayName, email: user.email, photo: user.photoURL };
-    afterAuth();
-  } else {
-    showLoginScreen();
-  }
+function getClientId() {
+  return localStorage.getItem('pat_gsi_client') || '';
 }
 
 function showLoginScreen() {
   document.getElementById('login-screen').style.display = 'block';
-  document.getElementById('onboarding').style.display = 'none';
-  document.getElementById('app').style.display = 'none';
+  document.getElementById('onboarding').style.display  = 'none';
+  document.getElementById('app').style.display         = 'none';
 }
 
 function afterAuth() {
   document.getElementById('login-screen').style.display = 'none';
-  S.name = ((CURRENT_USER.name || 'Usuário').split(' ')[0]);
-  // Check if onboarding was completed for this account
-  const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
+  S.name = (CURRENT_USER.name || 'Usuário').split(' ')[0];
+  const key   = 'pat_ob_' + (CURRENT_USER.email || 'demo');
   const saved = localStorage.getItem(key);
   if (saved) {
     try {
-      const st = JSON.parse(saved);
-      Object.assign(S, st);
+      Object.assign(S, JSON.parse(saved));
       document.getElementById('onboarding').style.display = 'none';
       document.getElementById('app').classList.add('show');
       initApp();
@@ -1546,7 +1526,7 @@ function afterAuth() {
   } else {
     document.getElementById('onboarding').style.display = 'block';
   }
-  setTimeout(updateSidebarUser, 100);
+  setTimeout(updateSidebarUser, 120);
 }
 
 function updateSidebarUser() {
@@ -1559,24 +1539,59 @@ function updateSidebarUser() {
   if (CURRENT_USER.photo) {
     const av = document.getElementById('s-avatar-letter');
     av.innerHTML = `<img src="${CURRENT_USER.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-    av.style.padding = '0';
-    av.style.overflow = 'hidden';
+    av.style.padding = '0'; av.style.overflow = 'hidden';
   }
 }
 
+// ── Google OAuth via GIS (abre popup real do Google) ──
 function signInGoogle() {
-  const cfg = fbReady();
-  if (!cfg) { openSetupModal(); return; }
+  const clientId = getClientId();
+  if (!clientId) { openSetupModal(); return; }
+
   const btn = document.getElementById('btn-google');
+
+  // Aguarda GIS carregar (script async)
+  if (typeof google === 'undefined' || !google?.accounts?.oauth2) {
+    btn.innerHTML = `<div class="spinner"></div> Carregando...`;
+    setTimeout(signInGoogle, 600);
+    return;
+  }
+
   btn.disabled = true;
-  btn.innerHTML = `<div class="spinner"></div> Conectando...`;
-  if (!firebase.apps.length) firebase.initializeApp(cfg);
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).catch(err => {
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>Continuar com o Google`;
-    alert('Erro ao conectar com Google: ' + err.message);
+  btn.innerHTML = `<div class="spinner"></div> Conectando com o Google...`;
+
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: 'openid profile email',
+    callback: async (resp) => {
+      if (resp.error) {
+        btn.disabled = false;
+        btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+        console.error('OAuth error:', resp.error);
+        return;
+      }
+      try {
+        const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: 'Bearer ' + resp.access_token }
+        });
+        const u = await r.json();
+        CURRENT_USER = { name: u.name, email: u.email, photo: u.picture };
+        localStorage.setItem('pat_gsi_user', JSON.stringify(CURRENT_USER));
+        afterAuth();
+      } catch(e) {
+        btn.disabled = false;
+        btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+        alert('Erro ao obter dados do Google: ' + e.message);
+      }
+    },
+    error_callback: (err) => {
+      btn.disabled = false;
+      btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+    }
   });
+
+  // Abre o popup de seleção de conta do Google
+  client.requestAccessToken({ prompt: 'select_account' });
 }
 
 function signInDemo() {
@@ -1586,40 +1601,39 @@ function signInDemo() {
 }
 
 function doLogout() {
+  if (CURRENT_USER && !CURRENT_USER.isDemo && typeof google !== 'undefined' && google?.accounts?.id) {
+    google.accounts.id.disableAutoSelect();
+  }
+  localStorage.removeItem('pat_gsi_user');
   localStorage.removeItem('pat_demo_user');
   CURRENT_USER = null;
-  if (firebase.apps && firebase.apps.length > 0) {
-    firebase.auth().signOut().then(() => location.reload());
-  } else {
-    location.reload();
-  }
+  location.reload();
 }
 
 function openSetupModal()  { document.getElementById('setup-modal').classList.add('open'); }
 function closeSetupModal() { document.getElementById('setup-modal').classList.remove('open'); }
 
-function saveFirebaseConfig() {
-  const raw = document.getElementById('fb-config-input').value.trim();
-  try {
-    const cfg = JSON.parse(raw);
-    if (!cfg.apiKey || cfg.apiKey.length < 10) throw new Error('apiKey inválida');
-    localStorage.setItem('pat_fb_config', JSON.stringify(cfg));
-    closeSetupModal();
-    location.reload();
-  } catch(e) {
-    alert('JSON inválido: ' + e.message + '\n\nCopie o objeto firebaseConfig exatamente como aparece no console do Firebase.');
+function saveClientId() {
+  const id = document.getElementById('gsi-client-id').value.trim();
+  if (!id.includes('apps.googleusercontent.com')) {
+    alert('ID inválido. O Client ID deve terminar com .apps.googleusercontent.com\n\nExemplo: 123456789-abc.apps.googleusercontent.com');
+    return;
   }
+  localStorage.setItem('pat_gsi_client', id);
+  closeSetupModal();
+  signInGoogle();
 }
 
-// ── Atualiza launchApp para salvar estado do onboarding ──
+// ── Salva estado do onboarding por usuário ──
 const _origLaunchApp = launchApp;
 launchApp = function() {
-  // Save onboarding state per user
   if (CURRENT_USER) {
     const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
-    const toSave = { name:S.name, wealth:S.wealth, profile:S.profile, riskScore:S.riskScore,
-      goals:S.goals, horizon:S.horizon, liquidity:S.liquidity, income:S.income };
-    localStorage.setItem(key, JSON.stringify(toSave));
+    localStorage.setItem(key, JSON.stringify({
+      name: S.name, wealth: S.wealth, profile: S.profile,
+      riskScore: S.riskScore, goals: S.goals,
+      horizon: S.horizon, liquidity: S.liquidity, income: S.income
+    }));
   }
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').classList.add('show');
@@ -1628,25 +1642,19 @@ launchApp = function() {
 };
 
 // ══════════════════ BOOT ══════════════════
-document.getElementById('tb-date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('tb-date').textContent = new Date().toLocaleDateString('pt-BR',{
+  weekday:'long', day:'2-digit', month:'long', year:'numeric'
+});
 
 (function boot() {
-  const cfg = fbReady();
-  if (cfg) {
-    // Firebase configured — let onAuthStateChanged drive everything
-    initFirebase(cfg);
-  } else {
-    // No Firebase — check for demo session
-    const demoUser = localStorage.getItem('pat_demo_user');
-    if (demoUser) {
-      try {
-        CURRENT_USER = JSON.parse(demoUser);
-        afterAuth();
-      } catch(e) { showLoginScreen(); }
-    } else {
-      showLoginScreen();
-    }
-  }
+  // Sessão Google salva?
+  const gsiUser = localStorage.getItem('pat_gsi_user');
+  if (gsiUser) { try { CURRENT_USER = JSON.parse(gsiUser); afterAuth(); return; } catch(e){} }
+  // Sessão demo salva?
+  const demoUser = localStorage.getItem('pat_demo_user');
+  if (demoUser) { try { CURRENT_USER = JSON.parse(demoUser); afterAuth(); return; } catch(e){} }
+  // Sem sessão → tela de login
+  showLoginScreen();
 })();
 </script>
 </body>
