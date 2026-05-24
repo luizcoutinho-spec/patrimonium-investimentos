@@ -1710,9 +1710,12 @@ function chartDefaults(scales={}) {
 // ══════════════════ CARTEIRAS ENGINE ══════════════════
 let _activeCarteira = null;
 
-function carteirasKey() { return 'pat_carteiras_' + (CURRENT_USER?.email || 'demo'); }
-function getCarteiras()  { try { return JSON.parse(localStorage.getItem(carteirasKey())) || []; } catch { return []; } }
-function saveCarteiras(l){ localStorage.setItem(carteirasKey(), JSON.stringify(l)); }
+function carteirasKey()    { return 'pat_carteiras_'  + (CURRENT_USER?.email || 'demo'); }
+function principalKey()   { return 'pat_principal_'  + (CURRENT_USER?.email || 'demo'); }
+function getCarteiras()   { try { return JSON.parse(localStorage.getItem(carteirasKey())) || []; } catch { return []; } }
+function saveCarteiras(l) { localStorage.setItem(carteirasKey(), JSON.stringify(l)); }
+function getPrincipalMeta()  { try { return JSON.parse(localStorage.getItem(principalKey())) || {}; } catch { return {}; } }
+function savePrincipalMeta(m){ localStorage.setItem(principalKey(), JSON.stringify(m)); }
 
 // ── Modal nova carteira ──
 let _ncProfile = 'conservador';
@@ -1749,7 +1752,12 @@ function saveNovaCarteira() {
 
 function deleteCarteira(id) {
   if (!confirm('Excluir esta carteira? Esta ação não pode ser desfeita.')) return;
-  saveCarteiras(getCarteiras().filter(c=>c.id!==id));
+  if (id === 'principal') {
+    const meta = getPrincipalMeta(); meta.deleted = true; savePrincipalMeta(meta);
+  } else {
+    saveCarteiras(getCarteiras().filter(c => c.id !== id));
+  }
+  if (_activeCarteira && _activeCarteira.id === id) exitCarteiraWs();
   renderCarteirasList();
 }
 
@@ -1764,18 +1772,18 @@ function renderCarteirasList() {
   const grid  = document.getElementById('carteiras-grid');
   const empty = document.getElementById('carteiras-empty');
 
-  // Card Principal (do onboarding, sempre existe, não pode ser excluída)
-  const principal = {
-    id: 'principal', name: 'Principal',
-    profile: S.profile, wealth: S.wealth, createdAt: null
-  };
-  const all = [principal, ...list];
+  // Card Principal (do onboarding) — pode ser renomeada/excluída
+  const principalMeta = getPrincipalMeta();
+  const all = [];
+  if (!principalMeta.deleted) {
+    all.push({ id:'principal', name: principalMeta.name || 'Principal', profile:S.profile, wealth:S.wealth, createdAt:null });
+  }
+  all.push(...list);
 
-  empty.style.display = list.length === 0 ? 'none' : 'none'; // empty só se não há nenhuma
+  empty.style.display = 'none';
 
   grid.innerHTML = all.map(c => {
     const profile   = c.profile || 'conservador';
-    const isPrinc   = c.id === 'principal';
     const date      = c.createdAt ? new Date(c.createdAt).toLocaleDateString('pt-BR') : 'Perfil principal';
     const profLabel = profile.charAt(0).toUpperCase() + profile.slice(1);
     const ativos    = getAtivos(c.id);
@@ -1788,15 +1796,15 @@ function renderCarteirasList() {
       <div class="ccard-stripe ${profile}"></div>
       <div class="ccard-body">
         <div class="ccard-top">
-          <div class="ccard-name" id="ccard-name-${c.id}">${c.name}${isPrinc ? ' <span style="font-size:10px;color:var(--txt3);font-weight:400">(perfil)</span>' : ''}</div>
-          ${isPrinc ? '' : `<div style="display:flex;gap:4px;align-items:center">
+          <div class="ccard-name" id="ccard-name-${c.id}">${c.name}</div>
+          <div style="display:flex;gap:4px;align-items:center">
             <button class="ccard-edit-btn" onclick="event.stopPropagation();renameCarteiraCard('${c.id}')" title="Renomear">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
             <button class="ccard-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
             </button>
-          </div>`}
+          </div>
         </div>
         <div class="ccard-badge ${profile}">${profLabel}</div>
         <div class="ccard-stats">
@@ -1826,7 +1834,7 @@ function renderCarteirasList() {
 function openCarteiraWs(id) {
   const list = getCarteiras();
   _activeCarteira = id === 'principal'
-    ? { id:'principal', name:'Principal', profile:S.profile, wealth:S.wealth }
+    ? { id:'principal', name: getPrincipalMeta().name || 'Principal', profile:S.profile, wealth:S.wealth }
     : (list.find(c=>c.id===id) || null);
   if (!_activeCarteira) return;
 
@@ -1851,10 +1859,17 @@ function openCarteiraWs(id) {
 function renameCarteiraCard(id) {
   const nameEl = document.getElementById('ccard-name-' + id);
   if (!nameEl) return;
-  const list    = getCarteiras();
-  const carteira= list.find(c => c.id === id);
-  if (!carteira) return;
-  const current = carteira.name;
+  const isPrincipal = id === 'principal';
+  let current;
+  let list, carteira;
+  if (isPrincipal) {
+    current = getPrincipalMeta().name || 'Principal';
+  } else {
+    list     = getCarteiras();
+    carteira = list.find(c => c.id === id);
+    if (!carteira) return;
+    current  = carteira.name;
+  }
 
   // Substitui o div por um input inline
   const inp = document.createElement('input');
@@ -1868,8 +1883,11 @@ function renameCarteiraCard(id) {
   function commit() {
     const val = inp.value.trim();
     if (val && val !== current) {
-      carteira.name = val;
-      saveCarteiras(list);
+      if (isPrincipal) {
+        const meta = getPrincipalMeta(); meta.name = val; savePrincipalMeta(meta);
+      } else {
+        carteira.name = val; saveCarteiras(list);
+      }
       // Se for a carteira ativa, atualiza sidebar e topbar também
       if (_activeCarteira && _activeCarteira.id === id) {
         _activeCarteira.name = val;
@@ -1887,9 +1905,9 @@ function renameCarteiraCard(id) {
 }
 
 function startRenameCarteira() {
-  if (!_activeCarteira || _activeCarteira.id === 'principal') return;
-  const nameEl = document.getElementById('s-cws-name');
-  const btnEl  = document.getElementById('s-cws-edit-btn');
+  if (!_activeCarteira) return;
+  const nameEl  = document.getElementById('s-cws-name');
+  const btnEl   = document.getElementById('s-cws-edit-btn');
   const current = _activeCarteira.name;
 
   // Substituir texto por input
@@ -1907,10 +1925,13 @@ function startRenameCarteira() {
   function commit() {
     const val = inp.value.trim();
     if (val && val !== current) {
-      // Salvar no storage
-      const list = getCarteiras();
-      const idx  = list.findIndex(c => c.id === _activeCarteira.id);
-      if (idx >= 0) { list[idx].name = val; saveCarteiras(list); }
+      if (_activeCarteira.id === 'principal') {
+        const meta = getPrincipalMeta(); meta.name = val; savePrincipalMeta(meta);
+      } else {
+        const list = getCarteiras();
+        const idx  = list.findIndex(c => c.id === _activeCarteira.id);
+        if (idx >= 0) { list[idx].name = val; saveCarteiras(list); }
+      }
       _activeCarteira.name = val;
       nameEl.textContent = val;
       document.getElementById('tb-title').textContent = val;
