@@ -1191,9 +1191,9 @@ function initApp() {
   animateCounter('kpi-patrimonio', 0, S.wealth, v => 'R$ ' + Math.round(v).toLocaleString('pt-BR'));
   animateCounter('kpi-rent', 0, 1.12, v => v.toFixed(2).replace('.',',') + '%');
   animateCounter('kpi-score', 0, 87, v => Math.round(v));
+  renderCarteirasList();
   setTimeout(() => {
     initDashboardCharts();
-    initCarteiraView();
     initMacroView();
     initSaudeView();
     initRebalView();
@@ -1286,7 +1286,9 @@ function initDashboardCharts() {
 }
 
 function renderAllocChart(canvasId, legendId, portfolio) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
+  const el = document.getElementById(canvasId);
+  if (!el) return;
+  const ctx = el.getContext('2d');
   new Chart(ctx, {
     type:'doughnut',
     data:{
