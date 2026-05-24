@@ -383,6 +383,16 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .tbl-grand-label{font-size:12px;font-weight:800;color:var(--txt);letter-spacing:.03em;text-transform:uppercase}
 .tbl-grand-val{font-size:14px;font-weight:800;font-family:'DM Mono',monospace;color:var(--green)}
 .tbl-grand-net{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)}
+/* ── Bulk-add modal ── */
+.bulk-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border-radius:8px;border:1px solid var(--border);transition:.15s}
+.bulk-row:hover{border-color:rgba(0,212,170,.22)}
+.bulk-row-info{flex:1;min-width:0}
+.bulk-row-name{font-size:12px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bulk-row-meta{font-size:10px;color:var(--txt3);margin-top:2px}
+.bulk-row-rate{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green);white-space:nowrap;min-width:80px;text-align:right}
+.bulk-row-input{width:110px;flex-shrink:0;padding:7px 10px;font-size:12px}
+.bulk-add-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,122,0,.1);color:#FF7A00;font-size:12px;font-weight:600;border:1px solid rgba(255,122,0,.25);border-radius:8px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.bulk-add-btn:hover{background:rgba(255,122,0,.18);border-color:rgba(255,122,0,.45)}
 .tbl-pct-num{font-size:11px;color:var(--txt2)}
 .mine-empty{text-align:center;padding:44px 20px;color:var(--txt3)}
 .mine-empty-icon{font-size:36px;margin-bottom:14px}
@@ -671,6 +681,23 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
   <div class="modal-btns">
     <button class="modal-btn-primary" onclick="saveNovaCarteira()">Criar carteira</button>
     <button class="modal-btn-ghost" onclick="closeNovaCarteira()">Cancelar</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ MODAL: REGISTRAR EM LOTE ══════════════════ -->
+<div class="modal-overlay" id="bulk-add-modal" style="display:none" onclick="if(event.target===this)closeBulkAdd()">
+<div class="modal-box" style="max-width:640px;max-height:92vh;display:flex;flex-direction:column">
+  <div class="modal-title" id="bulk-modal-title">Registrar Investimentos em Lote</div>
+  <div class="modal-sub">Preencha o valor aplicado em cada produto. Deixe em branco para ignorar.</div>
+  <div class="lf-field" style="margin-bottom:14px">
+    <label class="lf-label">Data de aplicação (aplicada a todos)</label>
+    <input class="lf-input" id="bulk-date" type="date">
+  </div>
+  <div id="bulk-product-list" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;padding-right:4px;margin-bottom:18px"></div>
+  <div class="modal-btns">
+    <button class="modal-btn-primary" onclick="saveBulkAdd()">Salvar preenchidos</button>
+    <button class="modal-btn-ghost" onclick="closeBulkAdd()">Cancelar</button>
   </div>
 </div>
 </div>
@@ -1067,10 +1094,16 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
             <div class="card">
               <div class="card-hdr">
                 <div class="card-title">Ativos da Carteira</div>
-                <button class="add-ativo-btn" onclick="atvTab('explore')">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  Adicionar ativo
-                </button>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <button class="bulk-add-btn" onclick="openBulkAdd('Banco Inter')">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Inter (em lote)
+                  </button>
+                  <button class="add-ativo-btn" onclick="atvTab('explore')">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Adicionar ativo
+                  </button>
+                </div>
               </div>
               <div class="mine-empty" id="mine-empty" style="display:none">
                 <div class="mine-empty-icon">📂</div>
@@ -2953,6 +2986,55 @@ function updateAddAtivoGain() {
 function closeAddAtivoModal() {
   document.getElementById('add-ativo-modal').style.display = 'none';
   _addAtivoId = null;
+}
+
+// ══ BULK ADD ══
+let _bulkBank = '';
+function openBulkAdd(bankName) {
+  _bulkBank = bankName;
+  const produtos = BANK_CATALOG.filter(p => p.bank === bankName);
+  document.getElementById('bulk-modal-title').textContent = 'Registrar Investimentos — ' + bankName;
+  document.getElementById('bulk-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('bulk-product-list').innerHTML = produtos.map(p => {
+    const net = calcNetYield(p);
+    const irTxt = p.irExempt ? ' · IR isento' : '';
+    return `<div class="bulk-row">
+      <div class="bulk-row-info">
+        <div class="bulk-row-name">${p.name}</div>
+        <div class="bulk-row-meta">${p.prazo} · ${p.garantia} · ${p.liq}${irTxt} · mín. R$&nbsp;${p.minInvest.toLocaleString('pt-BR')}</div>
+      </div>
+      <div class="bulk-row-rate">${fmtYield(net)}<div style="font-size:9px;color:var(--txt3);font-weight:400;text-align:right">líq. a.a.</div></div>
+      <input class="lf-input bulk-row-input" type="number" min="0" step="100"
+        placeholder="R$ valor" data-id="${p.id}">
+    </div>`;
+  }).join('');
+  document.getElementById('bulk-add-modal').style.display = 'flex';
+}
+function closeBulkAdd() {
+  document.getElementById('bulk-add-modal').style.display = 'none';
+}
+function saveBulkAdd() {
+  const date   = document.getElementById('bulk-date').value;
+  const inputs = document.querySelectorAll('#bulk-product-list input[data-id]');
+  const cid    = _activeCarteira?.id || 'principal';
+  const ativos = getAtivos(cid);
+  let added = 0;
+  inputs.forEach(inp => {
+    const val = parseFloat(inp.value);
+    if (!val || val <= 0) return;
+    const item = BANK_CATALOG.find(p => p.id === inp.dataset.id);
+    if (!item) return;
+    ativos.push({...item, investedValue: val, purchaseDate: date,
+      uid: Date.now() + '_' + Math.random().toString(36).slice(2,8)});
+    added++;
+  });
+  if (added === 0) {
+    alert('Nenhum valor preenchido. Informe ao menos um produto.');
+    return;
+  }
+  saveAtivos(cid, ativos);
+  closeBulkAdd();
+  atvTab('mine');
 }
 
 function saveAddAtivo() {
