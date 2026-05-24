@@ -108,6 +108,23 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .modal-btn-primary:hover{background:#00c49a}
 .modal-btn-ghost{padding:12px 18px;background:transparent;color:var(--txt2);font-size:13px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
 .modal-btn-ghost:hover{color:var(--txt);background:var(--bg-hover)}
+/* ── CARTEIRAS BAR ── */
+.cart-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.cart-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.cart-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--txt2);cursor:pointer;transition:.15s;font-family:'Inter',sans-serif}
+.cart-tab:hover{border-color:var(--border2);color:var(--txt)}
+.cart-tab.active{border-color:var(--green);background:var(--green-dim);color:var(--green)}
+.cart-tab-del{background:none;border:none;cursor:pointer;color:inherit;opacity:.5;padding:0;line-height:1;font-size:14px;transition:.15s}
+.cart-tab-del:hover{opacity:1;color:var(--red)}
+.cart-new-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--txt3);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0}
+.cart-new-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.nc-profiles{display:flex;gap:10px;margin-top:2px}
+.nc-opt{flex:1;padding:13px 14px;border:1.5px solid var(--border2);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
+.nc-opt:hover{background:var(--bg-hover)}
+.nc-opt.sel.conservador{border-color:var(--green);background:var(--green-dim)}
+.nc-opt.sel.moderado{border-color:var(--purple);background:var(--purple-dim)}
+.nc-opt-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.nc-opt-sub{font-size:11px;color:var(--txt3)}
 /* ── LOGOUT BTN ── */
 .s-logout{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:12px;font-weight:500;transition:.15s;background:transparent;border:none;font-family:'Inter',sans-serif;margin-top:8px}
 .s-logout:hover{color:var(--red);background:var(--red-dim)}
@@ -482,45 +499,38 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 </div>
 </div>
 
-<!-- ══════════════════ PROJECTS SCREEN ══════════════════ -->
-<div id="projects-screen">
-  <div class="ps-header">
-    <div class="ps-logo">PATRIMONIUM <span>/ Inteligência Patrimonial</span></div>
-    <div class="ps-user-row">
-      <div class="ps-avatar" id="ps-avatar">L</div>
-      <div class="ps-user-info">
-        <div class="ps-name" id="ps-name">Usuário</div>
-        <div class="ps-email" id="ps-email"></div>
+<!-- ══════════════════ MODAL: NOVA CARTEIRA ══════════════════ -->
+<div class="modal-overlay" id="nova-carteira-modal">
+<div class="modal-box" style="max-width:420px">
+  <div class="modal-title">Nova Carteira</div>
+  <div class="modal-sub">Crie uma carteira adicional com perfil e patrimônio próprios.</div>
+  <div class="lf-field" style="margin-bottom:16px">
+    <label class="lf-label">Nome da carteira</label>
+    <input class="lf-input" id="nc-name" type="text" placeholder="Ex: Aposentadoria, Reserva, Viagem…"
+      onkeydown="if(event.key==='Enter')saveNovaCarteira()">
+  </div>
+  <div class="lf-field" style="margin-bottom:16px">
+    <label class="lf-label">Perfil de risco</label>
+    <div class="nc-profiles">
+      <div class="nc-opt conservador sel" id="nc-opt-cons" onclick="selectNcProfile('conservador')">
+        <div class="nc-opt-title">Conservador</div>
+        <div class="nc-opt-sub">Proteção + renda estável</div>
       </div>
-      <button class="ps-logout-btn" onclick="doLogout()">Sair</button>
+      <div class="nc-opt moderado" id="nc-opt-mod" onclick="selectNcProfile('moderado')">
+        <div class="nc-opt-title">Moderado</div>
+        <div class="nc-opt-sub">Equilíbrio risco/retorno</div>
+      </div>
     </div>
   </div>
-  <div class="ps-body">
-    <div class="ps-toprow">
-      <div>
-        <div class="ps-heading">Minhas Carteiras</div>
-        <div class="ps-subheading">Cada carteira tem seu próprio perfil, alocação e simulações.</div>
-      </div>
-      <button class="ps-new-btn" onclick="createProject()">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Criar carteira
-      </button>
-    </div>
-
-    <!-- Cards de projetos (renderizados via JS) -->
-    <div class="proj-grid" id="proj-grid"></div>
-
-    <!-- Estado vazio -->
-    <div class="ps-empty" id="ps-empty" style="display:none">
-      <div class="ps-empty-icon">📊</div>
-      <div class="ps-empty-title">Nenhuma carteira ainda</div>
-      <div class="ps-empty-sub">Crie sua primeira carteira de investimentos.<br>Cada carteira tem simulador, análise de saúde e alocação próprios.</div>
-      <button class="ps-new-btn" style="margin:0 auto" onclick="createProject()">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Criar minha primeira carteira
-      </button>
-    </div>
+  <div class="lf-field" style="margin-bottom:20px">
+    <label class="lf-label">Patrimônio desta carteira (R$)</label>
+    <input class="lf-input" id="nc-wealth" type="number" min="0" placeholder="500000">
   </div>
+  <div class="modal-btns">
+    <button class="modal-btn-primary" onclick="saveNovaCarteira()">Criar carteira</button>
+    <button class="modal-btn-ghost" onclick="closeNovaCarteira()">Cancelar</button>
+  </div>
+</div>
 </div>
 
 <!-- ══════════════════ ONBOARDING ══════════════════ -->
@@ -537,14 +547,9 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 
   <!-- STEP 1 -->
   <div class="ob-step show" id="ob1">
-    <div class="ob-eyebrow" id="ob1-eyebrow">Nova Carteira</div>
-    <div class="ob-title" id="ob1-title">Dê um nome para esta carteira.</div>
-    <div class="ob-sub" id="ob1-sub">Uma carteira agrupa seus investimentos por objetivo. Você pode ter várias simultaneamente.</div>
-    <div class="ob-field">
-      <label class="ob-label">Nome da carteira</label>
-      <input class="ob-input" id="ob-project-name" placeholder="Ex: Aposentadoria, Viagem Europa, Reserva…" type="text"
-        onkeydown="if(event.key==='Enter')document.getElementById('ob-name').focus()">
-    </div>
+    <div class="ob-eyebrow">Bem-vindo</div>
+    <div class="ob-title">Vamos construir sua inteligência patrimonial.</div>
+    <div class="ob-sub">Responda com precisão. Cada detalhe calibra a IA que gerenciará sua alocação.</div>
     <div class="ob-field"><label class="ob-label">Seu nome</label><input class="ob-input" id="ob-name" placeholder="Ex: Ricardo Almeida" type="text"></div>
     <div class="ob-row">
       <div class="ob-field"><label class="ob-label">Profissão</label>
@@ -708,11 +713,6 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
       <div class="s-logo-mark">PATRIMONIUM</div>
       <div class="s-logo-sub">Inteligência Patrimonial</div>
     </div>
-    <!-- Indicador de projeto ativo -->
-    <div class="s-project-pill" id="s-project-pill" onclick="goToProjects()" title="Voltar às carteiras">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      <span class="s-project-pill-text" id="s-project-label">Carteiras</span>
-    </div>
     <div class="s-nav">
       <div class="s-nav-item active" onclick="nav('dashboard',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -825,6 +825,14 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 
       <!-- ─────── CARTEIRA ─────── -->
       <div class="view" id="view-carteira">
+        <!-- Seletor de carteiras -->
+        <div class="cart-bar">
+          <div class="cart-tabs" id="cart-tabs"></div>
+          <button class="cart-new-btn" onclick="openNovaCarteira()">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova carteira
+          </button>
+        </div>
         <div class="grid-65" style="margin-bottom:22px">
           <div class="card">
             <div class="card-title">Ativos da Carteira</div>
@@ -999,11 +1007,8 @@ let reactionVal = 0;
 
 function obNext(step) {
   if (step === 1) {
-    const pname = document.getElementById('ob-project-name').value.trim();
-    const n     = document.getElementById('ob-name').value.trim();
-    if (!pname) { document.getElementById('ob-project-name').style.borderColor='var(--red)'; return; }
-    if (!n)     { document.getElementById('ob-name').style.borderColor='var(--red)'; return; }
-    S.projectName = pname;
+    const n = document.getElementById('ob-name').value.trim();
+    if (!n) { document.getElementById('ob-name').style.borderColor='var(--red)'; return; }
     S.name = n.split(' ')[0];
   }
   if (step === 2) {
@@ -1219,20 +1224,90 @@ function chartDefaults(scales={}) {
 }
 
 // ══════════════════ CARTEIRA ══════════════════
-function initCarteiraView() {
-  const portfolio = buildPortfolio(S.profile);
-  const tbody = document.getElementById('asset-tbody');
-  tbody.innerHTML = portfolio.map(a => `
+// ── Gestão de múltiplas carteiras ──
+let _activeCarteira = null; // null = carteira principal (S.profile)
+
+function carteirasKey() { return 'pat_carteiras_' + (CURRENT_USER?.email || 'demo'); }
+function getCarteiras()  { try { return JSON.parse(localStorage.getItem(carteirasKey())) || []; } catch { return []; } }
+function saveCarteiras(l){ localStorage.setItem(carteirasKey(), JSON.stringify(l)); }
+
+function renderCarteiraBar() {
+  const list     = getCarteiras();
+  const activeId = _activeCarteira?.id || 'principal';
+  document.getElementById('cart-tabs').innerHTML =
+    `<button class="cart-tab ${activeId==='principal'?'active':''}" onclick="switchCarteira(null)">Principal</button>` +
+    list.map(c => `<button class="cart-tab ${activeId===c.id?'active':''}" onclick="switchCarteira('${c.id}')">
+      ${c.name}
+      <span class="cart-tab-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">×</span>
+    </button>`).join('');
+}
+
+function switchCarteira(id) {
+  _activeCarteira = id ? (getCarteiras().find(c=>c.id===id)||null) : null;
+  renderCarteiraBar();
+  renderCarteiraAtivos();
+}
+
+function deleteCarteira(id) {
+  if (!confirm('Excluir esta carteira?')) return;
+  const updated = getCarteiras().filter(c=>c.id!==id);
+  saveCarteiras(updated);
+  if (_activeCarteira?.id === id) _activeCarteira = null;
+  renderCarteiraBar();
+  renderCarteiraAtivos();
+}
+
+let _ncProfile = 'conservador';
+
+function openNovaCarteira() {
+  _ncProfile = 'conservador';
+  document.getElementById('nc-opt-cons').classList.add('sel');
+  document.getElementById('nc-opt-mod').classList.remove('sel');
+  document.getElementById('nc-name').value   = '';
+  document.getElementById('nc-wealth').value = '';
+  document.getElementById('nova-carteira-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('nc-name').focus(), 120);
+}
+function closeNovaCarteira() { document.getElementById('nova-carteira-modal').classList.remove('open'); }
+
+function selectNcProfile(p) {
+  _ncProfile = p;
+  document.getElementById('nc-opt-cons').classList.toggle('sel', p==='conservador');
+  document.getElementById('nc-opt-mod').classList.toggle('sel',  p==='moderado');
+}
+
+function saveNovaCarteira() {
+  const name   = document.getElementById('nc-name').value.trim();
+  const wealth = parseInt(document.getElementById('nc-wealth').value) || S.wealth;
+  if (!name) { document.getElementById('nc-name').style.borderColor='var(--red)'; return; }
+  const c = { id:'cart_'+Date.now(), name, profile:_ncProfile, wealth, createdAt:Date.now() };
+  const list = getCarteiras(); list.push(c); saveCarteiras(list);
+  _activeCarteira = c;
+  closeNovaCarteira();
+  renderCarteiraBar();
+  renderCarteiraAtivos();
+}
+
+function renderCarteiraAtivos() {
+  const profile = _activeCarteira ? _activeCarteira.profile : S.profile;
+  const wealth  = _activeCarteira ? _activeCarteira.wealth  : S.wealth;
+  const portfolio = buildPortfolio(profile);
+  document.getElementById('asset-tbody').innerHTML = portfolio.map(a => `
     <tr>
       <td><div class="at-name">${a.name}</div><div class="at-type">${a.type}</div></td>
       <td><span class="tag ${a.tag}">${a.tagTxt}</span></td>
-      <td><span class="mono">${a.pct}% — R$ ${Math.round(S.wealth*a.pct/100).toLocaleString('pt-BR')}</span></td>
+      <td><span class="mono">${a.pct}% — R$ ${Math.round(wealth*a.pct/100).toLocaleString('pt-BR')}</span></td>
       <td class="mono" style="color:var(--green)">${a.rate}</td>
       <td class="mono" style="color:var(--txt2)">${a.venc}</td>
       <td><span class="tag ${a.liq==='D+1'?'tag-green':a.liq==='No venc.'?'tag-amber':'tag-purple'}">${a.liq}</span></td>
       <td><span class="tag tag-green">Ativo</span></td>
     </tr>`).join('');
   renderAllocChart('chartAllocCart','alloc-legend-2',portfolio);
+}
+
+function initCarteiraView() {
+  renderCarteiraBar();
+  renderCarteiraAtivos();
 
   // Performance chart
   const months = ['Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
@@ -1906,64 +1981,25 @@ function renderProjectsScreen() {
   }).join('');
 }
 
-function showProjectsScreen() {
-  document.getElementById('login-screen').style.display    = 'none';
-  document.getElementById('projects-screen').style.display = 'block';
-  document.getElementById('onboarding').style.display      = 'none';
-  document.getElementById('app').classList.remove('show');
-  renderProjectsScreen();
-}
-
-function goToProjects() {
-  document.getElementById('app').classList.remove('show');
-  document.getElementById('projects-screen').style.display = 'block';
-  renderProjectsScreen();
-}
-
-function createProject() {
-  // Prepara onboarding como "novo projeto"
-  S.projectName = '';
-  document.getElementById('ob-project-name').value = '';
-  document.getElementById('ob-name').value          = CURRENT_USER?.name || '';
-  // Reset campos
-  ['ob-wealth','ob-income','ob-reserve','ob-horizon','ob-liquidity'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
-  });
-  document.querySelectorAll('.ob-goal.sel').forEach(el => {
-    el.classList.remove('sel'); const c = el.querySelector('.ob-check'); if(c) c.textContent='';
-  });
-  selectedGoals = [];
-  // Volta ao step 1
-  document.querySelectorAll('.ob-step').forEach(el => el.classList.remove('show'));
-  document.getElementById('ob1').classList.add('show');
-  obStep = 1;
-  for (let i = 1; i <= 5; i++) {
-    document.getElementById('pd'+i).classList.toggle('active', i === 1);
-  }
-  document.getElementById('projects-screen').style.display = 'none';
-  document.getElementById('onboarding').style.display      = 'block';
-  setTimeout(() => document.getElementById('ob-project-name').focus(), 120);
-}
-
-function openProject(id) {
-  const projects = getProjects();
-  const p        = projects.find(x => x.id === id);
-  if (!p) return;
-  Object.assign(S, p);
-  document.getElementById('projects-screen').style.display = 'none';
-  document.getElementById('app').classList.add('show');
-  // Atualiza label do projeto no sidebar
-  const lbl = document.getElementById('s-project-label');
-  if (lbl) lbl.textContent = p.projectName || 'Carteira';
-  initApp();
-  setTimeout(updateSidebarUser, 120);
-}
-
-// ── Após autenticação ── sempre vai para tela de projetos
+// ── Após autenticação ──
 function afterAuth() {
   document.getElementById('login-screen').style.display = 'none';
   S.name = (CURRENT_USER.name || 'Usuário').split(' ')[0];
-  showProjectsScreen();
+  const key   = 'pat_ob_' + (CURRENT_USER.email || 'demo');
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      Object.assign(S, JSON.parse(saved));
+      document.getElementById('onboarding').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initApp();
+    } catch(e) {
+      document.getElementById('onboarding').style.display = 'block';
+    }
+  } else {
+    document.getElementById('onboarding').style.display = 'block';
+  }
+  setTimeout(updateSidebarUser, 120);
 }
 
 function updateSidebarUser() {
@@ -1983,39 +2019,24 @@ function doLogout() {
   location.reload();
 }
 
-// ── Funções legadas mantidas por compatibilidade ──
+// ── Funções legadas ──
 function openSetupModal()  {}
 function closeSetupModal() {}
 function saveClientId()    {}
 
-// ── launchApp: salva como projeto novo e abre ──
+// ── Salva perfil do onboarding e abre app ──
 const _origLaunchApp = launchApp;
 launchApp = function() {
   if (CURRENT_USER) {
-    const id      = 'proj_' + Date.now();
-    const project = {
-      id,
-      projectName : S.projectName || 'Carteira',
-      name        : S.name,
-      wealth      : S.wealth,
-      income      : S.income,
-      profile     : S.profile,
-      riskScore   : S.riskScore,
-      goals       : S.goals,
-      horizon     : S.horizon,
-      liquidity   : S.liquidity,
-      createdAt   : Date.now()
-    };
-    const list = getProjects();
-    list.push(project);
-    saveProjects(list);
-    S.id = id;  // marca projeto ativo
+    const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
+    localStorage.setItem(key, JSON.stringify({
+      name: S.name, wealth: S.wealth, profile: S.profile,
+      riskScore: S.riskScore, goals: S.goals,
+      horizon: S.horizon, liquidity: S.liquidity, income: S.income
+    }));
   }
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').classList.add('show');
-  // Atualiza label do sidebar
-  const lbl = document.getElementById('s-project-label');
-  if (lbl) lbl.textContent = S.projectName || 'Carteira';
   initApp();
   setTimeout(updateSidebarUser, 200);
 };
