@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
 :root {
   --bg: #06080f;
@@ -37,6 +39,52 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:300;background:var(--bg);display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:40px 24px 80px}
+.login-wrap{width:100%;max-width:400px;margin:0 auto}
+.login-logo{font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--green);text-transform:uppercase;margin-bottom:52px}
+.login-logo span{color:var(--txt3);font-weight:400}
+.login-headline{font-size:32px;font-weight:800;line-height:1.15;margin-bottom:10px;letter-spacing:-.025em}
+.login-sub{font-size:14px;color:var(--txt2);margin-bottom:40px;line-height:1.65}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:15px 20px;background:#fff;color:#1f1f1f;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;border:none;border-radius:10px;cursor:pointer;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.2)}
+.btn-google:hover{background:#f8f8f8;transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.35),0 8px 20px rgba(0,0,0,.25)}
+.btn-google:active{transform:translateY(0);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.btn-google:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-sep{display:flex;align-items:center;gap:12px;margin:18px 0}
+.login-sep::before,.login-sep::after{content:'';flex:1;height:1px;background:var(--border2)}
+.login-sep span{font-size:11px;color:var(--txt3)}
+.btn-demo{width:100%;padding:13px;background:transparent;color:var(--txt2);font-size:14px;font-weight:500;border:1px solid var(--border2);border-radius:10px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.btn-demo:hover{border-color:var(--border2);color:var(--txt);background:var(--bg-hover)}
+.login-badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.login-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt3);background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:5px 10px}
+.login-setup-link{font-size:12px;color:var(--txt3);text-align:center;margin-top:24px;cursor:pointer;transition:.15s}
+.login-setup-link:hover{color:var(--txt2)}
+.login-setup-link a{color:var(--txt3);text-decoration:underline;text-underline-offset:3px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#1f1f1f;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── SETUP MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--bg-card);border:1px solid var(--border2);border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--txt2);margin-bottom:24px;line-height:1.6}
+.setup-step{display:flex;gap:14px;margin-bottom:18px}
+.setup-num{width:28px;height:28px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,212,170,.3);color:var(--green);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.setup-text{font-size:13px;color:var(--txt2);line-height:1.6}
+.setup-text strong{color:var(--txt)}
+.setup-text a{color:var(--green);text-decoration:none}
+.setup-text a:hover{text-decoration:underline}
+.setup-input{width:100%;background:var(--bg-card2);border:1px solid var(--border2);border-radius:8px;padding:12px;color:var(--txt);font-size:12px;font-family:'DM Mono',monospace;outline:none;resize:vertical;min-height:90px;margin:12px 0;transition:border .2s}
+.setup-input:focus{border-color:var(--green)}
+.modal-btns{display:flex;gap:10px;margin-top:4px}
+.modal-btn-primary{flex:1;padding:12px;background:var(--green);color:#000;font-size:13px;font-weight:700;border:none;border-radius:8px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.modal-btn-primary:hover{background:#00c49a}
+.modal-btn-ghost{padding:12px 18px;background:transparent;color:var(--txt2);font-size:13px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.modal-btn-ghost:hover{color:var(--txt);background:var(--bg-hover)}
+/* ── LOGOUT BTN ── */
+.s-logout{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:12px;font-weight:500;transition:.15s;background:transparent;border:none;font-family:'Inter',sans-serif;margin-top:8px}
+.s-logout:hover{color:var(--red);background:var(--red-dim)}
+.s-logout svg{width:14px;height:14px}
 /* ── ONBOARDING ── */
 #onboarding{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:40px 24px 80px}
 .ob-wrap{width:100%;max-width:560px;margin:0 auto}
@@ -265,6 +313,55 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 </head>
 <body>
 
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="login-screen">
+<div class="login-wrap">
+  <div class="login-logo">PATRIMONIUM <span>/ Inteligência Patrimonial</span></div>
+  <div class="login-headline">Seu patrimônio,<br>gerenciado com inteligência.</div>
+  <div class="login-sub">Acesse sua carteira personalizada e deixe a IA trabalhar pela sua independência financeira.</div>
+
+  <button class="btn-google" id="btn-google" onclick="signInGoogle()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+    Continuar com o Google
+  </button>
+
+  <div class="login-sep"><span>ou</span></div>
+  <button class="btn-demo" onclick="signInDemo()">Acessar em modo demonstração</button>
+
+  <div class="login-badges">
+    <div class="login-badge">🔒 Dados criptografados</div>
+    <div class="login-badge">🛡️ Sem acesso bancário</div>
+    <div class="login-badge">✦ Gratuito</div>
+  </div>
+  <div class="login-setup-link" onclick="openSetupModal()">⚙️ Como ativar o login real com Gmail?</div>
+</div>
+</div>
+
+<!-- ══════════════════ SETUP MODAL ══════════════════ -->
+<div class="modal-overlay" id="setup-modal">
+<div class="modal-box">
+  <div class="modal-title">Ativar login com Gmail</div>
+  <div class="modal-sub">O login Google usa o Firebase Authentication (gratuito). Configure em 3 passos:</div>
+  <div class="setup-step">
+    <div class="setup-num">1</div>
+    <div class="setup-text">Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>, crie um projeto e vá em <strong>Authentication → Provedores de login → Google → Ativar</strong>.</div>
+  </div>
+  <div class="setup-step">
+    <div class="setup-num">2</div>
+    <div class="setup-text">Em <strong>Configurações do projeto → Seus apps → Web</strong>, copie o objeto <code style="color:var(--green);font-family:'DM Mono',monospace">firebaseConfig</code> e cole abaixo:</div>
+  </div>
+  <textarea class="setup-input" id="fb-config-input" placeholder='{"apiKey":"AIza...","authDomain":"projeto.firebaseapp.com","projectId":"projeto","appId":"1:123:web:abc"}'></textarea>
+  <div class="setup-step">
+    <div class="setup-num">3</div>
+    <div class="setup-text">Em <strong>Authentication → Settings → Domínios autorizados</strong>, adicione: <code style="color:var(--green);font-family:'DM Mono',monospace">luizcoutinho-spec.github.io</code></div>
+  </div>
+  <div class="modal-btns">
+    <button class="modal-btn-primary" onclick="saveFirebaseConfig()">Salvar e ativar</button>
+    <button class="modal-btn-ghost" onclick="closeSetupModal()">Fechar</button>
+  </div>
+</div>
+</div>
+
 <!-- ══════════════════ ONBOARDING ══════════════════ -->
 <div id="onboarding">
 <div class="ob-wrap">
@@ -477,11 +574,15 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
     <div class="s-bottom">
       <div class="s-user">
         <div class="s-avatar" id="s-avatar-letter">R</div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="s-user-name" id="s-user-name">Ricardo</div>
-          <div class="s-user-plan">Premium</div>
+          <div class="s-user-email" id="s-user-email" style="font-size:10px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Premium</div>
         </div>
       </div>
+      <button class="s-logout" onclick="doLogout()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sair da conta
+      </button>
     </div>
   </nav>
 
@@ -808,6 +909,7 @@ function buildResultStep() {
     </div>`).join('');
 }
 function launchApp() {
+  // Will be overridden by auth wrapper below — this is a fallback
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').classList.add('show');
   initApp();
@@ -1193,17 +1295,170 @@ function initRebalView() {
   });
 }
 
-// ══════════════════ BOOT ══════════════════
-// Set today's date in topbar
-document.getElementById('tb-date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+// ══════════════════ FIREBASE / AUTH ══════════════════
+// Para ativar o login real com Gmail, clique em
+// "Como ativar o login real com Gmail?" na tela de login.
+const FIREBASE_CONFIG = {
+  apiKey: "",        // ← cole aqui após configurar o Firebase
+  authDomain: "",
+  projectId: "",
+  appId: ""
+};
 
-// Demo mode: skip onboarding if ?demo in URL
-if (window.location.search.includes('demo')) {
-  S.wealth = 547380; S.profile = 'conservador'; S.name = 'Ricardo';
+let CURRENT_USER = null;
+
+function fbReady() {
+  const inline = FIREBASE_CONFIG.apiKey.length > 10;
+  const stored = localStorage.getItem('pat_fb_config');
+  if (inline) return FIREBASE_CONFIG;
+  if (stored) { try { return JSON.parse(stored); } catch(e){} }
+  return null;
+}
+
+function initFirebase(cfg) {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(cfg);
+    firebase.auth().onAuthStateChanged(handleAuthChange);
+    return true;
+  } catch(e) { return false; }
+}
+
+function handleAuthChange(user) {
+  if (user) {
+    CURRENT_USER = { name: user.displayName, email: user.email, photo: user.photoURL };
+    afterAuth();
+  } else {
+    showLoginScreen();
+  }
+}
+
+function showLoginScreen() {
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+}
+
+function afterAuth() {
+  document.getElementById('login-screen').style.display = 'none';
+  S.name = ((CURRENT_USER.name || 'Usuário').split(' ')[0]);
+  // Check if onboarding was completed for this account
+  const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      const st = JSON.parse(saved);
+      Object.assign(S, st);
+      document.getElementById('onboarding').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initApp();
+    } catch(e) {
+      document.getElementById('onboarding').style.display = 'block';
+    }
+  } else {
+    document.getElementById('onboarding').style.display = 'block';
+  }
+  setTimeout(updateSidebarUser, 100);
+}
+
+function updateSidebarUser() {
+  if (!CURRENT_USER) return;
+  const first = (CURRENT_USER.name || 'Usuário').split(' ')[0];
+  document.getElementById('s-user-name').textContent = first;
+  document.getElementById('s-avatar-letter').textContent = first[0].toUpperCase();
+  const emailEl = document.getElementById('s-user-email');
+  if (emailEl) emailEl.textContent = CURRENT_USER.isDemo ? 'Modo demonstração' : (CURRENT_USER.email || '');
+  if (CURRENT_USER.photo) {
+    const av = document.getElementById('s-avatar-letter');
+    av.innerHTML = `<img src="${CURRENT_USER.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    av.style.padding = '0';
+    av.style.overflow = 'hidden';
+  }
+}
+
+function signInGoogle() {
+  const cfg = fbReady();
+  if (!cfg) { openSetupModal(); return; }
+  const btn = document.getElementById('btn-google');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner"></div> Conectando...`;
+  if (!firebase.apps.length) firebase.initializeApp(cfg);
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(err => {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>Continuar com o Google`;
+    alert('Erro ao conectar com Google: ' + err.message);
+  });
+}
+
+function signInDemo() {
+  CURRENT_USER = { name: 'Ricardo Silva', email: 'demo@patrimonium.app', photo: null, isDemo: true };
+  localStorage.setItem('pat_demo_user', JSON.stringify(CURRENT_USER));
+  afterAuth();
+}
+
+function doLogout() {
+  localStorage.removeItem('pat_demo_user');
+  CURRENT_USER = null;
+  if (firebase.apps && firebase.apps.length > 0) {
+    firebase.auth().signOut().then(() => location.reload());
+  } else {
+    location.reload();
+  }
+}
+
+function openSetupModal()  { document.getElementById('setup-modal').classList.add('open'); }
+function closeSetupModal() { document.getElementById('setup-modal').classList.remove('open'); }
+
+function saveFirebaseConfig() {
+  const raw = document.getElementById('fb-config-input').value.trim();
+  try {
+    const cfg = JSON.parse(raw);
+    if (!cfg.apiKey || cfg.apiKey.length < 10) throw new Error('apiKey inválida');
+    localStorage.setItem('pat_fb_config', JSON.stringify(cfg));
+    closeSetupModal();
+    location.reload();
+  } catch(e) {
+    alert('JSON inválido: ' + e.message + '\n\nCopie o objeto firebaseConfig exatamente como aparece no console do Firebase.');
+  }
+}
+
+// ── Atualiza launchApp para salvar estado do onboarding ──
+const _origLaunchApp = launchApp;
+launchApp = function() {
+  // Save onboarding state per user
+  if (CURRENT_USER) {
+    const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
+    const toSave = { name:S.name, wealth:S.wealth, profile:S.profile, riskScore:S.riskScore,
+      goals:S.goals, horizon:S.horizon, liquidity:S.liquidity, income:S.income };
+    localStorage.setItem(key, JSON.stringify(toSave));
+  }
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').classList.add('show');
   initApp();
-}
+  setTimeout(updateSidebarUser, 200);
+};
+
+// ══════════════════ BOOT ══════════════════
+document.getElementById('tb-date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+
+(function boot() {
+  const cfg = fbReady();
+  if (cfg) {
+    // Firebase configured — let onAuthStateChanged drive everything
+    initFirebase(cfg);
+  } else {
+    // No Firebase — check for demo session
+    const demoUser = localStorage.getItem('pat_demo_user');
+    if (demoUser) {
+      try {
+        CURRENT_USER = JSON.parse(demoUser);
+        afterAuth();
+      } catch(e) { showLoginScreen(); }
+    } else {
+      showLoginScreen();
+    }
+  }
+})();
 </script>
 </body>
 </html>
