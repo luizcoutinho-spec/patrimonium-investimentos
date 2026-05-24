@@ -1414,7 +1414,7 @@ function initApp() {
   document.getElementById('s-user-name').textContent = firstName;
   document.getElementById('s-avatar-letter').textContent = firstName[0].toUpperCase();
   document.getElementById('tb-date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  animateCounter('kpi-patrimonio', 0, S.wealth, v => 'R$ ' + Math.round(v).toLocaleString('pt-BR'));
+  refreshPatrimonioKpi(true);
   animateCounter('kpi-rent', 0, 1.12, v => v.toFixed(2).replace('.',',') + '%');
   animateCounter('kpi-score', 0, 87, v => Math.round(v));
   renderCarteirasList();
@@ -1438,6 +1438,24 @@ function animateCounter(id, from, to, fmt) {
     if (t < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+}
+
+function calcTotalPatrimonio() {
+  const carteiras = getCarteiras();
+  const ids = ['principal', ...carteiras.map(c => c.id)];
+  return ids.reduce((total, cid) => {
+    return total + getAtivos(cid).reduce((s, a) => s + (a.investedValue || 0), 0);
+  }, 0);
+}
+
+function refreshPatrimonioKpi(animate) {
+  const total = calcTotalPatrimonio();
+  if (animate) {
+    animateCounter('kpi-patrimonio', 0, total, v => 'R$ ' + Math.round(v).toLocaleString('pt-BR'));
+  } else {
+    const el = document.getElementById('kpi-patrimonio');
+    if (el) el.textContent = 'R$ ' + Math.round(total).toLocaleString('pt-BR');
+  }
 }
 
 // ══════════════════ NAVIGATION ══════════════════
@@ -3036,6 +3054,7 @@ function saveBulkAdd() {
   saveAtivos(cid, ativos);
   closeBulkAdd();
   atvTab('mine');
+  refreshPatrimonioKpi(false);
 }
 
 function saveAddAtivo() {
@@ -3056,12 +3075,14 @@ function saveAddAtivo() {
   saveAtivos(cid, ativos);
   closeAddAtivoModal();
   atvTab('mine');
+  refreshPatrimonioKpi(false);
 }
 
 function removeAtivo(cid, uid) {
   if (!confirm('Remover este ativo da carteira?')) return;
   saveAtivos(cid, getAtivos(cid).filter(a => a.uid !== uid));
   renderMinhaCarteira();
+  refreshPatrimonioKpi(false);
 }
 function saveClientId()    {}
 
