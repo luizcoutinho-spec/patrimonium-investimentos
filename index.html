@@ -108,16 +108,51 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .modal-btn-primary:hover{background:#00c49a}
 .modal-btn-ghost{padding:12px 18px;background:transparent;color:var(--txt2);font-size:13px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
 .modal-btn-ghost:hover{color:var(--txt);background:var(--bg-hover)}
-/* ── CARTEIRAS BAR ── */
-.cart-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
-.cart-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.cart-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--txt2);cursor:pointer;transition:.15s;font-family:'Inter',sans-serif}
-.cart-tab:hover{border-color:var(--border2);color:var(--txt)}
-.cart-tab.active{border-color:var(--green);background:var(--green-dim);color:var(--green)}
-.cart-tab-del{background:none;border:none;cursor:pointer;color:inherit;opacity:.5;padding:0;line-height:1;font-size:14px;transition:.15s}
-.cart-tab-del:hover{opacity:1;color:var(--red)}
-.cart-new-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--txt3);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0}
-.cart-new-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+/* ── CARTEIRAS LIST ── */
+.carteiras-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.carteiras-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.carteiras-sub{font-size:13px;color:var(--txt2);margin-top:3px}
+.carteiras-new-btn{display:flex;align-items:center;gap:7px;padding:11px 18px;background:var(--green);color:#000;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:.2s;white-space:nowrap;font-family:'Inter',sans-serif;flex-shrink:0}
+.carteiras-new-btn:hover{background:#00c49a;transform:translateY(-1px)}
+.carteiras-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.ccard{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .2s;cursor:pointer}
+.ccard:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ccard-stripe{height:3px}
+.ccard-stripe.conservador{background:linear-gradient(90deg,var(--green),#00b894)}
+.ccard-stripe.moderado{background:linear-gradient(90deg,var(--purple),#7c3aed)}
+.ccard-body{padding:20px}
+.ccard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.ccard-name{font-size:16px;font-weight:700}
+.ccard-del{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;border-radius:6px;line-height:0;transition:.15s}
+.ccard-del:hover{color:var(--red);background:var(--red-dim)}
+.ccard-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:14px}
+.ccard-badge.conservador{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,170,.2)}
+.ccard-badge.moderado{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+.ccard-stats{display:flex;gap:16px;margin-bottom:16px}
+.ccard-stat-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.ccard-stat-val{font-size:13px;font-weight:600}
+.ccard-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border)}
+.ccard-date{font-size:11px;color:var(--txt3)}
+.ccard-open{padding:7px 14px;background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.ccard-open:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.carteiras-empty{text-align:center;padding:64px 20px}
+.carteiras-empty-icon{font-size:44px;margin-bottom:14px;opacity:.35}
+.carteiras-empty-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.carteiras-empty-sub{font-size:13px;color:var(--txt3);margin-bottom:24px}
+/* ── WORKSPACE SIDEBAR ── */
+.s-cws-back{display:flex;align-items:center;gap:7px;width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:12px;font-weight:600;transition:.15s;background:transparent;border:none;font-family:'Inter',sans-serif;margin-bottom:8px}
+.s-cws-back:hover{color:var(--txt);background:var(--bg-hover)}
+.s-cws-back svg{width:13px;height:13px;flex-shrink:0}
+.s-cws-info{padding:10px 12px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;margin-bottom:12px}
+.s-cws-name{font-size:13px;font-weight:700;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-cws-badge{display:inline-flex;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.s-cws-badge.conservador{background:var(--green-dim);color:var(--green)}
+.s-cws-badge.moderado{background:var(--purple-dim);color:var(--purple)}
+/* ── WORKSPACE DASH ── */
+.cws-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:900px){.cws-kpi-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.cws-kpi-grid{grid-template-columns:1fr}}
+/* ── NOVA CARTEIRA MODAL ── */
 .nc-profiles{display:flex;gap:10px;margin-top:2px}
 .nc-opt{flex:1;padding:13px 14px;border:1.5px solid var(--border2);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
 .nc-opt:hover{background:var(--bg-hover)}
@@ -713,33 +748,51 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
       <div class="s-logo-mark">PATRIMONIUM</div>
       <div class="s-logo-sub">Inteligência Patrimonial</div>
     </div>
-    <div class="s-nav">
+    <!-- Navegação principal -->
+    <div class="s-nav" id="s-nav-main">
       <div class="s-nav-item active" onclick="nav('dashboard',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </div>
-      <div class="s-nav-item" onclick="nav('carteira',this)">
+      <div class="s-nav-item" onclick="nav('carteiras',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-        Carteira
+        Carteiras
       </div>
       <div class="s-nav-item" onclick="nav('macro',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         Radar Macro
       </div>
-      <div class="s-nav-item" onclick="nav('simulador',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        Simulador
-      </div>
       <div class="s-nav-item" onclick="nav('saude',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Saúde Financeira
       </div>
-      <div class="s-sep"></div>
-      <div class="s-tag">Otimização</div>
-      <div class="s-nav-item" onclick="nav('rebalanceamento',this)">
+    </div>
+
+    <!-- Navegação do workspace (aparece ao abrir uma carteira) -->
+    <div class="s-nav" id="s-nav-cws" style="display:none">
+      <button class="s-cws-back" onclick="exitCarteiraWs()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Carteiras
+      </button>
+      <div class="s-cws-info">
+        <div class="s-cws-name" id="s-cws-name">Carteira</div>
+        <div class="s-cws-badge conservador" id="s-cws-badge">Conservador</div>
+      </div>
+      <div class="s-nav-item active" id="cws-nav-dashboard" onclick="cwsNav('dashboard',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Visão Geral
+      </div>
+      <div class="s-nav-item" id="cws-nav-ativos" onclick="cwsNav('ativos',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        Ativos
+      </div>
+      <div class="s-nav-item" id="cws-nav-simulador" onclick="cwsNav('simulador',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Simulador
+      </div>
+      <div class="s-nav-item" id="cws-nav-rebalanceamento" onclick="cwsNav('rebalanceamento',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
         Rebalanceamento
-        <span class="s-plan-badge">2</span>
       </div>
     </div>
     <div class="s-bottom">
@@ -824,15 +877,48 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
       </div>
 
       <!-- ─────── CARTEIRA ─────── -->
-      <div class="view" id="view-carteira">
-        <!-- Seletor de carteiras -->
-        <div class="cart-bar">
-          <div class="cart-tabs" id="cart-tabs"></div>
-          <button class="cart-new-btn" onclick="openNovaCarteira()">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <!-- ─────── CARTEIRAS (lista) ─────── -->
+      <div class="view" id="view-carteiras">
+        <div class="carteiras-header">
+          <div>
+            <div class="carteiras-title">Carteiras</div>
+            <div class="carteiras-sub">Selecione uma carteira para analisar, simular e rebalancear.</div>
+          </div>
+          <button class="carteiras-new-btn" onclick="openNovaCarteira()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Nova carteira
           </button>
         </div>
+        <div class="carteiras-grid" id="carteiras-grid"></div>
+        <div class="carteiras-empty" id="carteiras-empty" style="display:none">
+          <div class="carteiras-empty-icon">📊</div>
+          <div class="carteiras-empty-title">Nenhuma carteira criada</div>
+          <div class="carteiras-empty-sub">Crie sua primeira carteira para começar a investir com inteligência.</div>
+          <button class="carteiras-new-btn" style="margin:0 auto" onclick="openNovaCarteira()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Criar primeira carteira
+          </button>
+        </div>
+      </div>
+
+      <!-- ─────── WORKSPACE: Visão Geral ─────── -->
+      <div class="view" id="view-cws-dashboard">
+        <div class="cws-kpi-grid" id="cws-kpis"></div>
+        <div class="grid-65">
+          <div class="card">
+            <div class="card-title">Alocação da Carteira</div>
+            <div style="height:220px;display:flex;align-items:center;justify-content:center"><canvas id="chartCwsAlloc"></canvas></div>
+            <div id="cws-alloc-legend" style="margin-top:12px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Performance Acumulada</div>
+            <div class="chart-wrap" style="height:220px"><canvas id="chartCwsPerf"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── WORKSPACE: Ativos ─────── -->
+      <div class="view" id="view-carteira">
         <div class="grid-65" style="margin-bottom:22px">
           <div class="card">
             <div class="card-title">Ativos da Carteira</div>
@@ -1130,13 +1216,23 @@ function animateCounter(id, from, to, fmt) {
 
 // ══════════════════ NAVIGATION ══════════════════
 function nav(view, el) {
-  document.querySelectorAll('.s-nav-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
+  // Garante que o workspace nav está oculto ao navegar no menu principal
+  document.getElementById('s-nav-cws').style.display  = 'none';
+  document.getElementById('s-nav-main').style.display = '';
+  _activeCarteira = null;
+
+  document.querySelectorAll('#s-nav-main .s-nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
-  const titles = {dashboard:'Dashboard',carteira:'Minha Carteira',macro:'Radar Macroeconômico',
-    simulador:'Simulador de Patrimônio',saude:'Saúde Financeira',rebalanceamento:'Rebalanceamento Inteligente'};
+  const titles = {
+    dashboard  : 'Dashboard',
+    carteiras  : 'Carteiras',
+    macro      : 'Radar Macroeconômico',
+    saude      : 'Saúde Financeira'
+  };
   document.getElementById('tb-title').textContent = titles[view] || view;
+  if (view === 'carteiras') renderCarteirasList();
 }
 
 // ══════════════════ DASHBOARD CHARTS ══════════════════
@@ -1224,47 +1320,22 @@ function chartDefaults(scales={}) {
 }
 
 // ══════════════════ CARTEIRA ══════════════════
-// ── Gestão de múltiplas carteiras ──
-let _activeCarteira = null; // null = carteira principal (S.profile)
+// ══════════════════ CARTEIRAS ENGINE ══════════════════
+let _activeCarteira = null;
 
 function carteirasKey() { return 'pat_carteiras_' + (CURRENT_USER?.email || 'demo'); }
 function getCarteiras()  { try { return JSON.parse(localStorage.getItem(carteirasKey())) || []; } catch { return []; } }
 function saveCarteiras(l){ localStorage.setItem(carteirasKey(), JSON.stringify(l)); }
 
-function renderCarteiraBar() {
-  const list     = getCarteiras();
-  const activeId = _activeCarteira?.id || 'principal';
-  document.getElementById('cart-tabs').innerHTML =
-    `<button class="cart-tab ${activeId==='principal'?'active':''}" onclick="switchCarteira(null)">Principal</button>` +
-    list.map(c => `<button class="cart-tab ${activeId===c.id?'active':''}" onclick="switchCarteira('${c.id}')">
-      ${c.name}
-      <span class="cart-tab-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">×</span>
-    </button>`).join('');
-}
-
-function switchCarteira(id) {
-  _activeCarteira = id ? (getCarteiras().find(c=>c.id===id)||null) : null;
-  renderCarteiraBar();
-  renderCarteiraAtivos();
-}
-
-function deleteCarteira(id) {
-  if (!confirm('Excluir esta carteira?')) return;
-  const updated = getCarteiras().filter(c=>c.id!==id);
-  saveCarteiras(updated);
-  if (_activeCarteira?.id === id) _activeCarteira = null;
-  renderCarteiraBar();
-  renderCarteiraAtivos();
-}
-
+// ── Modal nova carteira ──
 let _ncProfile = 'conservador';
 
 function openNovaCarteira() {
   _ncProfile = 'conservador';
-  document.getElementById('nc-opt-cons').classList.add('sel');
-  document.getElementById('nc-opt-mod').classList.remove('sel');
+  selectNcProfile('conservador');
   document.getElementById('nc-name').value   = '';
   document.getElementById('nc-wealth').value = '';
+  document.getElementById('nc-name').style.borderColor = '';
   document.getElementById('nova-carteira-modal').classList.add('open');
   setTimeout(()=>document.getElementById('nc-name').focus(), 120);
 }
@@ -1278,60 +1349,222 @@ function selectNcProfile(p) {
 
 function saveNovaCarteira() {
   const name   = document.getElementById('nc-name').value.trim();
-  const wealth = parseInt(document.getElementById('nc-wealth').value) || S.wealth;
+  const wealth = parseInt(document.getElementById('nc-wealth').value) || S.wealth || 100000;
   if (!name) { document.getElementById('nc-name').style.borderColor='var(--red)'; return; }
   const c = { id:'cart_'+Date.now(), name, profile:_ncProfile, wealth, createdAt:Date.now() };
   const list = getCarteiras(); list.push(c); saveCarteiras(list);
-  _activeCarteira = c;
   closeNovaCarteira();
-  renderCarteiraBar();
-  renderCarteiraAtivos();
+  renderCarteirasList();
+  // Abre o workspace da nova carteira automaticamente
+  openCarteiraWs(c.id);
 }
 
-function renderCarteiraAtivos() {
-  const profile = _activeCarteira ? _activeCarteira.profile : S.profile;
-  const wealth  = _activeCarteira ? _activeCarteira.wealth  : S.wealth;
-  const portfolio = buildPortfolio(profile);
-  document.getElementById('asset-tbody').innerHTML = portfolio.map(a => `
-    <tr>
-      <td><div class="at-name">${a.name}</div><div class="at-type">${a.type}</div></td>
-      <td><span class="tag ${a.tag}">${a.tagTxt}</span></td>
-      <td><span class="mono">${a.pct}% — R$ ${Math.round(wealth*a.pct/100).toLocaleString('pt-BR')}</span></td>
-      <td class="mono" style="color:var(--green)">${a.rate}</td>
-      <td class="mono" style="color:var(--txt2)">${a.venc}</td>
-      <td><span class="tag ${a.liq==='D+1'?'tag-green':a.liq==='No venc.'?'tag-amber':'tag-purple'}">${a.liq}</span></td>
-      <td><span class="tag tag-green">Ativo</span></td>
-    </tr>`).join('');
-  renderAllocChart('chartAllocCart','alloc-legend-2',portfolio);
+function deleteCarteira(id) {
+  if (!confirm('Excluir esta carteira? Esta ação não pode ser desfeita.')) return;
+  saveCarteiras(getCarteiras().filter(c=>c.id!==id));
+  renderCarteirasList();
 }
 
-function initCarteiraView() {
-  renderCarteiraBar();
-  renderCarteiraAtivos();
+// ── Lista de carteiras ──
+function wFmt(w) {
+  if (!w) return '—';
+  return w >= 1e6 ? 'R$ '+(w/1e6).toFixed(1).replace('.',',')+'M' : 'R$ '+(w/1000).toFixed(0)+'k';
+}
+
+function renderCarteirasList() {
+  const list  = getCarteiras();
+  const grid  = document.getElementById('carteiras-grid');
+  const empty = document.getElementById('carteiras-empty');
+
+  // Card Principal (do onboarding, sempre existe, não pode ser excluída)
+  const principal = {
+    id: 'principal', name: 'Principal',
+    profile: S.profile, wealth: S.wealth, createdAt: null
+  };
+  const all = [principal, ...list];
+
+  empty.style.display = list.length === 0 ? 'none' : 'none'; // empty só se não há nenhuma
+
+  grid.innerHTML = all.map(c => {
+    const profile  = c.profile || 'conservador';
+    const isPrinc  = c.id === 'principal';
+    const date     = c.createdAt ? new Date(c.createdAt).toLocaleDateString('pt-BR') : 'Perfil principal';
+    const profLabel= profile.charAt(0).toUpperCase() + profile.slice(1);
+    return `
+    <div class="ccard" onclick="openCarteiraWs('${c.id}')">
+      <div class="ccard-stripe ${profile}"></div>
+      <div class="ccard-body">
+        <div class="ccard-top">
+          <div class="ccard-name">${c.name}${isPrinc ? ' <span style="font-size:10px;color:var(--txt3);font-weight:400">(perfil)</span>' : ''}</div>
+          ${isPrinc ? '' : `<button class="ccard-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>`}
+        </div>
+        <div class="ccard-badge ${profile}">${profLabel}</div>
+        <div class="ccard-stats">
+          <div>
+            <div class="ccard-stat-label">Patrimônio</div>
+            <div class="ccard-stat-val">${wFmt(c.wealth)}</div>
+          </div>
+        </div>
+        <div class="ccard-footer">
+          <div class="ccard-date">${date}</div>
+          <button class="ccard-open" onclick="event.stopPropagation();openCarteiraWs('${c.id}')">Abrir →</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Workspace: entrar / sair ──
+function openCarteiraWs(id) {
+  const list = getCarteiras();
+  _activeCarteira = id === 'principal'
+    ? { id:'principal', name:'Principal', profile:S.profile, wealth:S.wealth }
+    : (list.find(c=>c.id===id) || null);
+  if (!_activeCarteira) return;
+
+  // Sidebar: mostra workspace, esconde principal
+  document.getElementById('s-nav-main').style.display = 'none';
+  document.getElementById('s-nav-cws').style.display  = '';
+
+  // Atualiza info no sidebar
+  document.getElementById('s-cws-name').textContent   = _activeCarteira.name;
+  const badge = document.getElementById('s-cws-badge');
+  badge.textContent = _activeCarteira.profile.charAt(0).toUpperCase() + _activeCarteira.profile.slice(1);
+  badge.className   = 's-cws-badge ' + _activeCarteira.profile;
+
+  // Topbar
+  document.getElementById('tb-title').textContent = _activeCarteira.name;
+
+  // Navega para visão geral da carteira
+  cwsNav('dashboard', document.getElementById('cws-nav-dashboard'));
+}
+
+function exitCarteiraWs() {
+  _activeCarteira = null;
+  document.getElementById('s-nav-cws').style.display  = 'none';
+  document.getElementById('s-nav-main').style.display = '';
+  nav('carteiras', document.querySelector('#s-nav-main .s-nav-item:nth-child(2)'));
+}
+
+// ── Workspace: navegação interna ──
+function cwsNav(section, el) {
+  // Desativa todos os itens do workspace nav
+  document.querySelectorAll('#s-nav-cws .s-nav-item').forEach(i=>i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Esconde todas as views
+  ['view-cws-dashboard','view-carteira','view-simulador','view-rebalanceamento'].forEach(id=>{
+    const v = document.getElementById(id);
+    if (v) v.classList.remove('active');
+  });
+
+  const titleMap = {
+    dashboard   : _activeCarteira?.name || 'Carteira',
+    ativos      : 'Ativos',
+    simulador   : 'Simulador',
+    rebalanceamento : 'Rebalanceamento'
+  };
+  document.getElementById('tb-title').textContent = titleMap[section] || section;
+
+  if (section === 'dashboard') {
+    document.getElementById('view-cws-dashboard').classList.add('active');
+    initCwsDashboard();
+  } else if (section === 'ativos') {
+    document.getElementById('view-carteira').classList.add('active');
+    initCarteiraView();
+  } else if (section === 'simulador') {
+    document.getElementById('view-simulador').classList.add('active');
+    initSimuladorView();
+  } else if (section === 'rebalanceamento') {
+    document.getElementById('view-rebalanceamento').classList.add('active');
+    initRebalanceView();
+  }
+}
+
+// ── Dashboard da carteira ──
+function initCwsDashboard() {
+  const c       = _activeCarteira || { profile: S.profile, wealth: S.wealth };
+  const profile = c.profile;
+  const wealth  = c.wealth;
+  const port    = buildPortfolio(profile);
+
+  // Taxa estimada conforme perfil
+  const taxaAnual = profile === 'moderado' ? 0.1380 : 0.1365;
+  const rendMes   = Math.round(wealth * taxaAnual / 12);
+  const profLabel = profile.charAt(0).toUpperCase() + profile.slice(1);
+
+  document.getElementById('cws-kpis').innerHTML = `
+    <div class="kpi fade-up">
+      <div class="kpi-label">Patrimônio</div>
+      <div class="kpi-value" style="color:var(--txt)">${wealth.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}</div>
+      <div class="kpi-sub">Valor investido nesta carteira</div>
+      <div class="kpi-accent" style="background:var(--green)"></div>
+    </div>
+    <div class="kpi fade-up-2">
+      <div class="kpi-label">Renda Estimada / Mês</div>
+      <div class="kpi-value" style="color:var(--green)">${rendMes.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}</div>
+      <div class="kpi-sub">Base: ${(taxaAnual*100).toFixed(2).replace('.',',')}% a.a.</div>
+      <div class="kpi-accent" style="background:var(--green)"></div>
+    </div>
+    <div class="kpi fade-up-3">
+      <div class="kpi-label">Perfil</div>
+      <div class="kpi-value" style="color:var(--purple);font-size:20px">${profLabel}</div>
+      <div class="kpi-sub">${port.length} ativos alocados</div>
+      <div class="kpi-accent" style="background:var(--purple)"></div>
+    </div>`;
+
+  renderAllocChart('chartCwsAlloc','cws-alloc-legend', port);
 
   // Performance chart
   const months = ['Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
   const cart  = [100,101.1,102.3,103.5,104.6,105.9,107.1,108.4,109.7,111.2];
   const cdi   = [100,100.9,101.8,102.7,103.6,104.5,105.4,106.4,107.3,108.3];
   const ipca  = [100,100.3,100.6,101.0,101.4,101.7,102.1,102.5,102.8,103.2];
-  const ctx = document.getElementById('chartPerf').getContext('2d');
+  const ctx = document.getElementById('chartCwsPerf')?.getContext('2d');
+  if (!ctx) return;
   new Chart(ctx, {
     type:'line',
     data:{labels:months, datasets:[
       {label:'Carteira',data:cart,borderColor:'#00d4aa',backgroundColor:'transparent',borderWidth:2,tension:0.4,pointRadius:0},
-      {label:'CDI',data:cdi,borderColor:'rgba(148,163,184,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[4,4]},
-      {label:'IPCA',data:ipca,borderColor:'rgba(245,158,11,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[2,4]},
+      {label:'CDI',    data:cdi, borderColor:'rgba(148,163,184,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[4,4]},
+      {label:'IPCA',   data:ipca,borderColor:'rgba(245,158,11,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[2,4]},
     ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,position:'top',align:'end',labels:{color:'#94a3b8',font:{size:11},boxWidth:20,padding:16}},
         tooltip:{backgroundColor:'#0f1421',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'rgba(148,163,184,.15)',borderWidth:1,padding:10}},
-      scales:{
-        y:{ticks:{callback:v=>v.toFixed(1),color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},
-        x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}
-      }
-    }
+      scales:{y:{ticks:{callback:v=>v.toFixed(1),color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},
+        x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}}}
   });
+}
+
+function initCarteiraView() {
+  const c       = _activeCarteira || { profile: S.profile, wealth: S.wealth };
+  const portfolio = buildPortfolio(c.profile);
+  document.getElementById('asset-tbody').innerHTML = portfolio.map(a => `
+    <tr>
+      <td><div class="at-name">${a.name}</div><div class="at-type">${a.type}</div></td>
+      <td><span class="tag ${a.tag}">${a.tagTxt}</span></td>
+      <td><span class="mono">${a.pct}% — R$ ${Math.round(c.wealth*a.pct/100).toLocaleString('pt-BR')}</span></td>
+      <td class="mono" style="color:var(--green)">${a.rate}</td>
+      <td class="mono" style="color:var(--txt2)">${a.venc}</td>
+      <td><span class="tag ${a.liq==='D+1'?'tag-green':a.liq==='No venc.'?'tag-amber':'tag-purple'}">${a.liq}</span></td>
+      <td><span class="tag tag-green">Ativo</span></td>
+    </tr>`).join('');
+  renderAllocChart('chartAllocCart','alloc-legend-2',portfolio);
+
+  const months = ['Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
+  const cart=[100,101.1,102.3,103.5,104.6,105.9,107.1,108.4,109.7,111.2];
+  const cdi=[100,100.9,101.8,102.7,103.6,104.5,105.4,106.4,107.3,108.3];
+  const ipca=[100,100.3,100.6,101.0,101.4,101.7,102.1,102.5,102.8,103.2];
+  const ctx = document.getElementById('chartPerf')?.getContext('2d');
+  if (!ctx) return;
+  new Chart(ctx,{type:'line',data:{labels:months,datasets:[
+    {label:'Carteira',data:cart,borderColor:'#00d4aa',backgroundColor:'transparent',borderWidth:2,tension:0.4,pointRadius:0},
+    {label:'CDI',data:cdi,borderColor:'rgba(148,163,184,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[4,4]},
+    {label:'IPCA',data:ipca,borderColor:'rgba(245,158,11,.4)',backgroundColor:'transparent',borderWidth:1.5,tension:0.4,pointRadius:0,borderDash:[2,4]},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{color:'#94a3b8',font:{size:11},boxWidth:20,padding:16}},tooltip:{backgroundColor:'#0f1421',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'rgba(148,163,184,.15)',borderWidth:1,padding:10}},scales:{y:{ticks:{callback:v=>v.toFixed(1),color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}}}});
 }
 
 // ══════════════════ MACRO — DADOS AO VIVO (BCB / FOCUS) ══════════════════
