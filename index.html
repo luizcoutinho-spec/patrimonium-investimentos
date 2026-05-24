@@ -1083,64 +1083,253 @@ function initCarteiraView() {
   });
 }
 
-// ══════════════════ MACRO ══════════════════
-function initMacroView() {
-  const indicators = [
-    {label:'Selic (Meta)',value:'13,75%',delta:'+0,00%',trend:'Estável — COPOM',color:'var(--green)'},
-    {label:'IPCA 12m',value:'4,82%',delta:'▲ vs meta 3,5%',trend:'Acima da meta',color:'var(--amber)'},
-    {label:'IGP-M 12m',value:'5,18%',delta:'▲ pressão',trend:'Insumos em alta',color:'var(--amber)'},
-    {label:'Dólar (R$)',value:'R$ 4,97',delta:'▲ +2,1% mês',trend:'Volatilidade moderada',color:'var(--txt)'},
-    {label:'Curva DI Jan/27',value:'12,80%',delta:'▼ −0,3% mês',trend:'Expectativa de corte',color:'var(--green)'},
-    {label:'Risco Fiscal',value:'Moderado',delta:'Déficit controlado',trend:'Arcabouço fiscal ativo',color:'var(--amber)'},
-    {label:'PIB Projetado 2025',value:'+2,1%',delta:'Revisão +0,2%',trend:'Crescimento resiliente',color:'var(--green)'},
-    {label:'Desemprego (PNAD)',value:'6,8%',delta:'▼ Menor desde 2014',trend:'Mercado aquecido',color:'var(--green)'},
-  ];
-  document.getElementById('macro-indicators').innerHTML = indicators.map(i=>`
-    <div class="macro-card">
-      <div class="mc-label">${i.label}</div>
-      <div class="mc-value" style="color:${i.color}">${i.value}</div>
-      <div class="mc-delta" style="color:${i.color}">${i.delta}</div>
-      <div class="mc-trend">${i.trend}</div>
-    </div>`).join('');
+// ══════════════════ MACRO — DADOS AO VIVO (BCB / FOCUS) ══════════════════
+// Fontes oficiais: api.bcb.gov.br (SGS) e olinda.bcb.gov.br (Expectativas)
+const MACRO_TTL = 60 * 60 * 1000; // cache 1 hora
+let _curvaChart = null;
 
-  document.getElementById('macro-analysis').innerHTML = `
-    <div class="insight-item">
-      <div class="insight-label green">CENÁRIO BASE — IA PATRIMONIAL</div>
-      <div class="insight-text">Com Selic em 13,75% e IPCA projetado em 4,5% para 2025, o juro real está em +8,8% a.a. — patamar historicamente favorável para renda fixa. A IA avalia que o ciclo de cortes deve iniciar no 2S/2025, tornando este o melhor momento para aumentar duration e capturar prêmio em prefixados intermediários.</div>
-    </div>
-    <div class="insight-item warn" style="margin-top:10px">
-      <div class="insight-label amber">RISCO MONITORADO</div>
-      <div class="insight-text">Pressão fiscal e resultado primário abaixo do esperado podem elevar prêmio de risco e pressionar curva longa. Recomenda-se manter 35% em Tesouro Selic como âncora de liquidez e proteção defensiva.</div>
-    </div>
-    <div class="insight-item info" style="margin-top:10px">
-      <div class="insight-label blue">OPORTUNIDADE IDENTIFICADA</div>
-      <div class="insight-text">Debêntures incentivadas do setor elétrico apresentando IPCA+7,2% — prêmio 180bps acima da NTN-B com rating AA e isenção de IR. Exposição máxima recomendada: 8–12% do portfólio.</div>
+async function bcbFetch(series, n) {
+  const r = await fetch(
+    `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${series}/dados/ultimos/${n}?formato=json`
+  );
+  if (!r.ok) throw new Error('BCB ' + series);
+  return r.json();
+}
+
+async function focusFetch(indicator) {
+  const f = encodeURIComponent(`Indicador eq '${indicator}'`);
+  const r = await fetch(
+    `https://olinda.bcb.gov.br/olinda/servico/Expectations/versao/v1/odata/` +
+    `ExpectativasMercadoAnuais?$filter=${f}&$orderby=Data%20desc&$top=20` +
+    `&$format=json&$select=Indicador,Data,Mediana,Ano`
+  );
+  if (!r.ok) throw new Error('FOCUS ' + indicator);
+  const js = await r.json();
+  return js.value || [];
+}
+
+async function loadMacroData() {
+  const hit = localStorage.getItem('pat_macro_v3');
+  if (hit) {
+    const obj = JSON.parse(hit);
+    if (Date.now() - obj.ts < MACRO_TTL) return obj.data;
+  }
+  const results = await Promise.allSettled([
+    bcbFetch(432,  3),   // Selic Meta definida pelo COPOM
+    bcbFetch(13522,2),   // IPCA acumulado 12 meses
+    bcbFetch(12,   2),   // IGP-M acumulado 12 meses
+    bcbFetch(1,    3),   // Dólar PTAX venda
+    bcbFetch(24369,2),   // Desemprego PNAD Contínua
+    focusFetch('IPCA'),
+    focusFetch('Selic'),
+    focusFetch('PIB Total'),
+  ]);
+  const v = i => results[i].status === 'fulfilled' ? results[i].value : null;
+  const data = {
+    selic: v(0), ipca12m: v(1), igpm12m: v(2),
+    dolar: v(3), desemprego: v(4),
+    focusIpca: v(5), focusSelic: v(6), focusPib: v(7),
+    fetchedAt: new Date().toISOString()
+  };
+  localStorage.setItem('pat_macro_v3', JSON.stringify({ ts: Date.now(), data }));
+  return data;
+}
+
+function parseBCB(arr, pos) {
+  if (!arr || !arr.length) return null;
+  const i = pos === undefined ? arr.length - 1 : pos < 0 ? arr.length + pos : pos;
+  const item = arr[i];
+  if (!item) return null;
+  return { valor: parseFloat(String(item.valor).replace(',', '.')), data: item.data };
+}
+
+function focusGet(arr, year) {
+  if (!arr || !arr.length) return null;
+  const list = year ? arr.filter(d => String(d.Ano) === String(year)) : arr;
+  return list.length ? list[0] : null;
+}
+
+function fp(v, d) { return v == null ? '—' : v.toFixed(d ?? 2).replace('.', ',') + '%'; }
+function fb(v)    { return v == null ? '—' : 'R$ ' + v.toFixed(2).replace('.', ','); }
+function fdelta(cur, prev) {
+  if (!cur || !prev) return '—';
+  const d = cur.valor - prev.valor;
+  return (d >= 0 ? '▲ +' : '▼ ') + Math.abs(d).toFixed(2).replace('.', ',');
+}
+
+function generateAnalysis(sV, iV, focusI, focusS) {
+  const real = sV != null && iV != null ? sV - iV : null;
+  const cutting = focusS != null && sV != null && focusS < sV;
+  return [
+    {
+      cls: '',
+      label: 'CENÁRIO BASE — IA PATRIMONIAL',
+      lCls: 'green',
+      text: real != null
+        ? `Juro real atual: ${fp(real)} a.a. (Selic ${fp(sV)} − IPCA 12m ${fp(iV)}). ` +
+          (real > 8 ? 'Patamar excepcionalmente favorável para renda fixa — um dos maiores retornos reais dos últimos 20 anos. ' : 'Retorno real positivo sustenta alocação conservadora. ') +
+          (focusS != null ? `Mercado projeta Selic em ${fp(focusS)} ao fim do ano. ` : '') +
+          (cutting ? 'Janela favorável para aumentar duration em prefixados antes do ciclo de cortes.' : 'Manter carrego elevado como estratégia dominante.')
+        : 'Dados macroeconômicos sendo processados...'
+    },
+    {
+      cls: iV != null && iV > 5 ? 'warn' : 'info',
+      label: iV != null && iV > 5 ? 'RISCO INFLACIONÁRIO' : 'INFLAÇÃO — MONITORAMENTO',
+      lCls: iV != null && iV > 5 ? 'amber' : 'blue',
+      text: `IPCA acumulado 12 meses: ${fp(iV)}. ` +
+        (iV != null ? (iV > 6 ? 'Acima do teto da meta — pressão relevante. Aumentar proteção em IPCA+.' :
+          iV > 4.5 ? 'Acima do centro da meta (3,50%), mas dentro da banda. Proteção em IPCA+ adequada.' :
+          iV < 2 ? 'Abaixo do piso da meta. Atenção à desinflação excessiva.' :
+          'Dentro da meta. Cenário benigno para renda fixa.') : '') +
+        (focusI != null ? ` FOCUS projeta IPCA de ${fp(focusI)} para o ano corrente.` : '')
+    },
+    {
+      cls: cutting ? '' : 'info',
+      label: cutting ? 'OPORTUNIDADE — CURVA PREFIXADA' : 'CURVA DE JUROS',
+      lCls: cutting ? 'green' : 'blue',
+      text: cutting
+        ? `FOCUS indica queda da Selic de ${fp(sV)} para ${fp(focusS)} até o fim do ano. ` +
+          'Cada ponto de queda na curva gera ganho de capital em Prefixado e IPCA+. ' +
+          'Momento favorável para alongar duration gradualmente.'
+        : `Mercado projeta ${fp(focusS)} para Selic no fim do ano. ` +
+          'Manter mix entre Tesouro Selic (liquidez) e IPCA+ (proteção real) como estrutura base.'
+    }
+  ];
+}
+
+async function initMacroView() {
+  document.getElementById('macro-indicators').innerHTML = `
+    <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:16px 0;color:var(--txt3);font-size:13px">
+      <div style="width:16px;height:16px;flex-shrink:0;border:2px solid rgba(148,163,184,.15);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite"></div>
+      Consultando Banco Central do Brasil e FOCUS/BCB...
     </div>`;
 
-  // Curva DI
-  const verts = ['Jan/25','Jul/25','Jan/26','Jul/26','Jan/27','Jan/28','Jan/30'];
-  const rates = [13.65,13.20,12.80,12.40,12.10,11.80,11.40];
+  let data;
+  try {
+    data = await loadMacroData();
+  } catch(e) {
+    document.getElementById('macro-indicators').innerHTML =
+      `<div style="grid-column:1/-1;padding:20px;color:var(--amber);font-size:13px">
+        ⚠️ Não foi possível conectar ao BCB. Verifique sua conexão e clique em Atualizar.
+        <span onclick="refreshMacroView()" style="margin-left:12px;color:var(--green);cursor:pointer;text-decoration:underline">↻ Tentar novamente</span>
+       </div>`;
+    return;
+  }
+
+  const selic  = parseBCB(data.selic);
+  const selicP = parseBCB(data.selic, -2);
+  const ipca   = parseBCB(data.ipca12m);
+  const ipcaP  = parseBCB(data.ipca12m, -2);
+  const igpm   = parseBCB(data.igpm12m);
+  const dolar  = parseBCB(data.dolar);
+  const dolarP = parseBCB(data.dolar, -2);
+  const desemp = parseBCB(data.desemprego);
+
+  const yr = new Date().getFullYear();
+  const fI  = focusGet(data.focusIpca,  yr);
+  const fS  = focusGet(data.focusSelic, yr);
+  const fP  = focusGet(data.focusPib,   yr);
+
+  const sV = selic ? selic.valor : null;
+  const iV = ipca  ? ipca.valor  : null;
+  const gV = igpm  ? igpm.valor  : null;
+  const dV = dolar ? dolar.valor : null;
+  const eV = desemp? desemp.valor: null;
+  const fIV = fI ? fI.Mediana : null;
+  const fSV = fS ? fS.Mediana : null;
+  const fPV = fP ? fP.Mediana : null;
+
+  function dolDelta() {
+    if (!dolar || !dolarP) return '—';
+    const d = dolar.valor - dolarP.valor;
+    return (d >= 0 ? '▲ +' : '▼ ') + Math.abs(d / dolarP.valor * 100).toFixed(1).replace('.', ',') + '%';
+  }
+
+  const upd = new Date(data.fetchedAt);
+  const updStr = upd.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) +
+                 ' às ' + upd.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  const cards = [
+    { label:'Selic Meta',          value:fp(sV),                  delta:fdelta(selic, selicP)||'Estável', trend:'COPOM · Banco Central do Brasil',                      color: 'var(--green)' },
+    { label:'IPCA acum. 12m',      value:fp(iV),                  delta:fdelta(ipca, ipcaP),              trend:'Meta: 3,50% ±1,5pp · IBGE',                           color: iV&&iV>5?'var(--amber)':iV&&iV>4?'var(--amber)':'var(--green)' },
+    { label:'IGP-M acum. 12m',     value:fp(gV),                  delta:'—',                              trend:'Índice Geral de Preços · FGV',                         color: gV&&gV>6?'var(--amber)':'var(--txt)' },
+    { label:'Dólar PTAX',          value:fb(dV),                  delta:dolDelta(),                       trend:'Taxa de câmbio venda · BCB',                           color: 'var(--txt)' },
+    { label:`FOCUS IPCA ${yr}`,    value:fp(fIV),                 delta:fIV&&iV?(fIV>iV?'▲ acima do atual':'▼ abaixo do atual'):'—', trend:'Mediana expectativa mercado · BCB', color:fIV&&fIV>5?'var(--amber)':'var(--green)' },
+    { label:`FOCUS Selic ${yr}`,   value:fp(fSV),                 delta:fSV&&sV?(fSV<sV?'▼ corte esperado':'▲ alta esperada'):'—',  trend:'Mediana expectativa mercado · BCB', color:fSV&&sV&&fSV<sV?'var(--green)':'var(--amber)' },
+    { label:`FOCUS PIB ${yr}`,     value:fp(fPV,1),               delta:'—',                              trend:'Crescimento real projetado · BCB',                     color:fPV&&fPV>2?'var(--green)':'var(--amber)' },
+    { label:'Desemprego PNAD',     value:fp(eV,1),                delta:'—',                              trend:'Taxa de desocupação · IBGE',                           color:eV&&eV<8?'var(--green)':'var(--amber)' },
+  ];
+
+  document.getElementById('macro-indicators').innerHTML =
+    `<div style="grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:4px;gap:8px">
+       <span style="font-size:11px;color:var(--txt3)">Fontes: <strong style="color:var(--txt2)">Banco Central do Brasil · FOCUS/BCB · IBGE</strong></span>
+       <span style="display:flex;align-items:center;gap:10px">
+         <span style="font-size:11px;color:var(--txt3)">Atualizado ${updStr}</span>
+         <span onclick="refreshMacroView()" style="font-size:11px;color:var(--green);cursor:pointer;padding:3px 10px;border:1px solid rgba(0,212,170,.3);border-radius:5px" onmouseover="this.style.background='rgba(0,212,170,.1)'" onmouseout="this.style.background='transparent'">↻ Atualizar</span>
+       </span>
+     </div>` +
+    cards.map(c => `
+    <div class="macro-card">
+      <div class="mc-label">${c.label}</div>
+      <div class="mc-value" style="color:${c.color}">${c.value}</div>
+      <div class="mc-delta" style="color:${c.color}">${c.delta}</div>
+      <div class="mc-trend">${c.trend}</div>
+    </div>`).join('');
+
+  // Análise dinâmica baseada nos dados reais
+  const analysis = generateAnalysis(sV, iV, fIV, fSV);
+  document.getElementById('macro-analysis').innerHTML = analysis.map((a,i) => `
+    <div class="insight-item ${a.cls}" ${i>0?'style="margin-top:10px"':''}>
+      <div class="insight-label ${a.lCls}">${a.label}</div>
+      <div class="insight-text">${a.text}</div>
+    </div>`).join('');
+
+  // Curva DI — construída a partir das projeções FOCUS Selic por ano
+  const diPts = [];
+  for (let y = yr; y <= yr + 5; y++) {
+    const pt = focusGet(data.focusSelic, y);
+    if (pt) diPts.push({ label: String(y), rate: pt.Mediana });
+  }
+  const curveL = diPts.length >= 3 ? diPts.map(p=>p.label) : [yr,yr+1,yr+2,yr+3,yr+4,yr+5].map(String);
+  const curveR = diPts.length >= 3 ? diPts.map(p=>p.rate)  : [13.75,12.5,11.5,11.0,10.75,10.5];
+
+  if (_curvaChart) { _curvaChart.destroy(); _curvaChart = null; }
   const ctxC = document.getElementById('chartCurva').getContext('2d');
   const gradC = ctxC.createLinearGradient(0,0,0,220);
-  gradC.addColorStop(0,'rgba(139,92,246,.2)'); gradC.addColorStop(1,'rgba(139,92,246,.01)');
-  new Chart(ctxC, {
+  gradC.addColorStop(0,'rgba(139,92,246,.22)'); gradC.addColorStop(1,'rgba(139,92,246,.01)');
+  _curvaChart = new Chart(ctxC, {
     type:'line',
-    data:{labels:verts,datasets:[{data:rates,borderColor:'#8b5cf6',backgroundColor:gradC,borderWidth:2,fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:'#8b5cf6',pointBorderColor:'var(--bg-card)',pointBorderWidth:2}]},
-    options: chartDefaults({y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}})
+    data:{labels:curveL,datasets:[{data:curveR,borderColor:'#8b5cf6',backgroundColor:gradC,
+      borderWidth:2,fill:true,tension:0.3,pointRadius:5,
+      pointBackgroundColor:'#8b5cf6',pointBorderColor:'var(--bg-card)',pointBorderWidth:2}]},
+    options:chartDefaults({
+      y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},
+      x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}
+    })
   });
 
+  // Impacto no portfólio — contextualizado com dados reais
+  const cutting = fSV != null && sV != null && fSV < sV;
   document.getElementById('macro-impact').innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       ${[
-        {t:'Tesouro Selic',i:'Beneficiado pela Selic elevada. Manter alocação atual.',c:'var(--green)',s:'Manter'},
-        {t:'Tesouro IPCA+',i:'Prêmio na curva longa atrativo. Considerar aumento de duration.',c:'var(--green)',s:'Aumentar'},
-        {t:'CDB / LCI',i:'Spreads comprimindo com crédito privado aquecido. Monitorar renovações.',c:'var(--amber)',s:'Neutro'},
+        {t:'Tesouro Selic', c:'var(--green)', s: cutting?'Reduzir gradual':'Manter',
+          i: cutting ? `Rendendo ${fp(sV)}. Com cortes projetados (→ ${fp(fSV)}), migrar parte para prefixados.` : `Rendendo ${fp(sV)} com liquidez D+1. Principal âncora da carteira.`},
+        {t:'Tesouro IPCA+', c:'var(--green)', s: cutting?'Aumentar':'Manter',
+          i: `IPCA 12m em ${fp(iV)}. ${cutting?'Momento favorável para alongar duration e capturar ganho de capital.':'Proteção real garantida. Manter exposição atual.'}`},
+        {t:'CDB / LCI', c:'var(--amber)', s:'Neutro',
+          i: `Taxas de crédito privado atrativas com Selic em ${fp(sV)}. Monitorar spreads nas renovações.`},
       ].map(x=>`<div class="card" style="padding:14px">
         <div style="font-size:11px;font-weight:700;color:var(--txt3);margin-bottom:8px;letter-spacing:.06em">${x.t.toUpperCase()}</div>
         <div style="font-size:12px;color:var(--txt2);line-height:1.5;margin-bottom:8px">${x.i}</div>
         <span class="tag" style="color:${x.c};background:${x.c}22">${x.s}</span>
       </div>`).join('')}
     </div>`;
+}
+
+async function refreshMacroView() {
+  localStorage.removeItem('pat_macro_v3');
+  await initMacroView();
 }
 
 // ══════════════════ SIMULATOR ══════════════════
