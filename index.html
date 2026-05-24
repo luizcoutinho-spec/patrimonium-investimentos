@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -156,8 +156,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .s-cws-badge.moderado{background:var(--purple-dim);color:var(--purple)}
 .s-cws-badge.agressivo{background:var(--red-dim);color:var(--red)}
 /* ── WORKSPACE DASH ── */
-.cws-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
-@media(max-width:900px){.cws-kpi-grid{grid-template-columns:1fr 1fr}}
+.cws-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:1100px){.cws-kpi-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.cws-kpi-grid{grid-template-columns:1fr}}
 /* ── NOVA CARTEIRA MODAL ── */
 .nc-profiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:2px}
@@ -1084,6 +1084,22 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
             <div class="chart-wrap" style="height:220px"><canvas id="chartCwsPerf"></canvas></div>
           </div>
         </div>
+        <div class="card" id="cws-daily-yield-card" style="display:none">
+          <div class="card-hdr">
+            <div class="card-title">Rentabilidade Diária</div>
+            <div id="cws-daily-yield-total" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)"></div>
+          </div>
+          <div style="overflow-x:auto">
+          <table class="asset-table" style="min-width:500px">
+            <thead><tr>
+              <th>Ativo</th><th>Banco</th>
+              <th>Valor investido</th><th>Rent. líquida a.a.</th>
+              <th style="text-align:right">R$/dia</th><th style="text-align:right">R$/mês</th>
+            </tr></thead>
+            <tbody id="cws-daily-yield-tbody"></tbody>
+          </table>
+          </div>
+        </div>
       </div>
 
       <!-- ─────── WORKSPACE: Ativos ─────── -->
@@ -1926,6 +1942,12 @@ function initCwsDashboard() {
       <div class="kpi-value" style="color:var(--purple);font-size:20px">${profLabel}</div>
       <div class="kpi-sub">${hasAtivos ? weightedNet.toFixed(2).replace('.',',')+' % a.a. líq. médio' : 'Sem ativos registrados'}</div>
       <div class="kpi-accent" style="background:var(--purple)"></div>
+    </div>
+    <div class="kpi fade-up-3">
+      <div class="kpi-label">Rentabilidade Diária</div>
+      <div class="kpi-value" style="color:var(--green);font-size:22px">${hasAtivos ? 'R$ '+(total*weightedNet/100/365).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</div>
+      <div class="kpi-sub">${hasAtivos ? 'R$ '+(total*weightedNet/100/12).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' / mês' : 'Adicione ativos'}</div>
+      <div class="kpi-accent" style="background:var(--green)"></div>
     </div>`;
 
   // ── Donut de alocação — real por tipo ──
@@ -1978,6 +2000,13 @@ function initCwsDashboard() {
         tooltip:{backgroundColor:'#0f1421',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'rgba(148,163,184,.15)',borderWidth:1,padding:10}},
       scales:{y:{ticks:{callback:v=>v.toFixed(1),color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},
               x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}}}});
+
+  // ── Rentabilidade diária por ativo ──
+  renderDailyYield(ativos, {
+    card: 'cws-daily-yield-card',
+    tbody: 'cws-daily-yield-tbody',
+    total: 'cws-daily-yield-total'
+  });
 }
 
 // Atualizado: initCarteiraView agora abre a aba "Minha Carteira"
@@ -2987,10 +3016,13 @@ function renderMinhaCarteira() {
   renderDailyYield(ativos);
 }
 
-function renderDailyYield(ativos) {
-  const card  = document.getElementById('daily-yield-card');
-  const tbody = document.getElementById('daily-yield-tbody');
-  const totalEl = document.getElementById('daily-yield-total');
+function renderDailyYield(ativos, ids) {
+  const cardId  = (ids && ids.card)  || 'daily-yield-card';
+  const tbodyId = (ids && ids.tbody) || 'daily-yield-tbody';
+  const totalId = (ids && ids.total) || 'daily-yield-total';
+  const card    = document.getElementById(cardId);
+  const tbody   = document.getElementById(tbodyId);
+  const totalEl = document.getElementById(totalId);
   if (!card || !tbody) return;
 
   if (!ativos || !ativos.length) { card.style.display = 'none'; return; }
@@ -3000,8 +3032,8 @@ function renderDailyYield(ativos) {
   let totalDay = 0, totalMonth = 0;
 
   const rows = ativos.map(a => {
-    const net      = calcNetYield(a);
-    const val      = a.investedValue || 0;
+    const net     = calcNetYield(a);
+    const val     = a.investedValue || 0;
     const daily    = val * net / 100 / 365;
     const monthly  = val * net / 100 / 12;
     totalDay   += daily;
@@ -3019,11 +3051,9 @@ function renderDailyYield(ativos) {
     </tr>`;
   });
 
-  // Linha de total
   rows.push(`<tr class="dy-total-row">
     <td colspan="2" style="color:var(--txt);font-size:12px;letter-spacing:.04em;text-transform:uppercase">Total da Carteira</td>
-    <td></td>
-    <td></td>
+    <td></td><td></td>
     <td class="dy-val" style="font-size:13px;color:var(--green)">${fmtR(totalDay)}</td>
     <td class="dy-month" style="font-size:12px;color:var(--green);font-weight:700">${fmtR(totalMonth)}</td>
   </tr>`);
