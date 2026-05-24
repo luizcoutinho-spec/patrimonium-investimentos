@@ -319,20 +319,37 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
   <div class="login-headline">Seu patrimônio,<br>gerenciado com inteligência.</div>
   <div class="login-sub">Acesse sua carteira personalizada e deixe a IA trabalhar pela sua independência financeira.</div>
 
-  <button class="btn-google" id="btn-google" onclick="signInGoogle()">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
-    Continuar com o Google
-  </button>
-
-  <div class="login-sep"><span>ou</span></div>
-  <button class="btn-demo" onclick="signInDemo()">Acessar em modo demonstração</button>
-
-  <div class="login-badges">
-    <div class="login-badge">🔒 Dados criptografados</div>
-    <div class="login-badge">🛡️ Sem acesso bancário</div>
-    <div class="login-badge">✦ Gratuito</div>
+  <!-- Botão principal Google -->
+  <div id="login-main-block">
+    <button class="btn-google" id="btn-google" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908C16.658 14.013 17.64 11.705 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Continuar com o Google
+    </button>
+    <div class="login-sep"><span>ou</span></div>
+    <button class="btn-demo" onclick="signInDemo()">Acessar em modo demonstração</button>
+    <div class="login-badges">
+      <div class="login-badge">🔒 Dados criptografados</div>
+      <div class="login-badge">🛡️ Sem acesso bancário</div>
+      <div class="login-badge">✦ Gratuito</div>
+    </div>
   </div>
-  <div class="login-setup-link" onclick="openSetupModal()">⚙️ Como ativar o login real com Gmail?</div>
+
+  <!-- Formulário inline de email (aparece ao clicar em Continuar com o Google) -->
+  <div id="email-form" style="display:none">
+    <div style="font-size:12px;color:var(--txt2);text-align:center;margin-bottom:14px;letter-spacing:.04em">
+      ENTRE COM SUA CONTA GOOGLE
+    </div>
+    <input type="email" id="gmail-input" class="ob-input"
+      placeholder="seu.nome@gmail.com"
+      autocomplete="email"
+      style="font-size:15px;padding:14px 16px;border-radius:10px"
+      onkeydown="if(event.key==='Enter')submitEmailLogin()">
+    <div id="email-error" style="display:none;color:#f87171;font-size:12px;margin-top:6px;text-align:center"></div>
+    <button class="btn-google" style="margin-top:12px;background:var(--green);color:#000;border:none;font-weight:700" onclick="submitEmailLogin()">
+      Entrar →
+    </button>
+    <button class="btn-demo" style="margin-top:8px" onclick="backToLoginMain()">← Voltar</button>
+  </div>
 </div>
 </div>
 
@@ -1543,55 +1560,87 @@ function updateSidebarUser() {
   }
 }
 
-// ── Google OAuth via GIS (abre popup real do Google) ──
+// ── Google login: tenta OAuth real; se não configurado, abre form inline de email ──
 function signInGoogle() {
   const clientId = getClientId();
-  if (!clientId) { openSetupModal(); return; }
 
-  const btn = document.getElementById('btn-google');
+  // Se Client ID configurado e GIS disponível → OAuth real
+  if (clientId && typeof google !== 'undefined' && google?.accounts?.oauth2) {
+    const btn = document.getElementById('btn-google');
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spinner"></div> Conectando com o Google...`;
 
-  // Aguarda GIS carregar (script async)
-  if (typeof google === 'undefined' || !google?.accounts?.oauth2) {
-    btn.innerHTML = `<div class="spinner"></div> Carregando...`;
-    setTimeout(signInGoogle, 600);
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: 'openid profile email',
+      callback: async (resp) => {
+        if (resp.error) {
+          btn.disabled = false;
+          btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+          return;
+        }
+        try {
+          const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: 'Bearer ' + resp.access_token }
+          });
+          const u = await r.json();
+          CURRENT_USER = { name: u.name, email: u.email, photo: u.picture };
+          localStorage.setItem('pat_gsi_user', JSON.stringify(CURRENT_USER));
+          afterAuth();
+        } catch(e) {
+          btn.disabled = false;
+          btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+        }
+      },
+      error_callback: () => {
+        btn.disabled = false;
+        btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
+      }
+    });
+    client.requestAccessToken({ prompt: 'select_account' });
     return;
   }
 
-  btn.disabled = true;
-  btn.innerHTML = `<div class="spinner"></div> Conectando com o Google...`;
+  // Sem Client ID configurado → exibe form inline de email (zero-config)
+  document.getElementById('login-main-block').style.display = 'none';
+  document.getElementById('email-form').style.display       = 'block';
+  setTimeout(() => {
+    const inp = document.getElementById('gmail-input');
+    if (inp) inp.focus();
+  }, 120);
+}
 
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: clientId,
-    scope: 'openid profile email',
-    callback: async (resp) => {
-      if (resp.error) {
-        btn.disabled = false;
-        btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
-        console.error('OAuth error:', resp.error);
-        return;
-      }
-      try {
-        const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: 'Bearer ' + resp.access_token }
-        });
-        const u = await r.json();
-        CURRENT_USER = { name: u.name, email: u.email, photo: u.picture };
-        localStorage.setItem('pat_gsi_user', JSON.stringify(CURRENT_USER));
-        afterAuth();
-      } catch(e) {
-        btn.disabled = false;
-        btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
-        alert('Erro ao obter dados do Google: ' + e.message);
-      }
-    },
-    error_callback: (err) => {
-      btn.disabled = false;
-      btn.innerHTML = GOOGLE_SVG + ' Continuar com o Google';
-    }
-  });
+function backToLoginMain() {
+  document.getElementById('email-form').style.display       = 'none';
+  document.getElementById('login-main-block').style.display = 'block';
+  document.getElementById('email-error').style.display      = 'none';
+  document.getElementById('gmail-input').value              = '';
+}
 
-  // Abre o popup de seleção de conta do Google
-  client.requestAccessToken({ prompt: 'select_account' });
+function submitEmailLogin() {
+  const raw   = (document.getElementById('gmail-input').value || '').trim().toLowerCase();
+  const errEl = document.getElementById('email-error');
+  errEl.style.display = 'none';
+
+  if (!raw || !raw.includes('@') || !raw.includes('.')) {
+    errEl.textContent    = 'Por favor, insira um e-mail válido.';
+    errEl.style.display  = 'block';
+    document.getElementById('gmail-input').focus();
+    return;
+  }
+
+  // Extrai nome amigável do local-part (ex: luiz.coutinho → Luiz Coutinho)
+  const local = raw.split('@')[0];
+  const name  = local.replace(/[._\-+]/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(' ') || 'Usuário';
+
+  CURRENT_USER = { name, email: raw, photo: null };
+  localStorage.setItem('pat_gsi_user', JSON.stringify(CURRENT_USER));
+  afterAuth();
 }
 
 function signInDemo() {
