@@ -336,6 +336,68 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
   .ob-btn{padding:13px;margin-top:6px}
   .ob-btn-ghost{padding:11px;margin-top:6px}
 }
+
+/* ══════════════════ PROJECTS SCREEN ══════════════════ */
+#projects-screen{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ps-header{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(6,8,15,.95);backdrop-filter:blur(8px);z-index:10}
+.ps-logo{font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--green);text-transform:uppercase}
+.ps-logo span{color:var(--txt3);font-weight:400;letter-spacing:.08em}
+.ps-user-row{display:flex;align-items:center;gap:12px}
+.ps-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,212,170,.3);color:var(--green);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ps-user-info .ps-name{font-size:13px;font-weight:600;color:var(--txt)}
+.ps-user-info .ps-email{font-size:11px;color:var(--txt3)}
+.ps-logout-btn{background:none;border:1px solid var(--border);color:var(--txt3);font-size:12px;padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif}
+.ps-logout-btn:hover{color:var(--red);border-color:rgba(244,63,94,.4);background:var(--red-dim)}
+.ps-body{max-width:1120px;margin:0 auto;padding:44px 40px 80px}
+.ps-toprow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:36px;flex-wrap:wrap}
+.ps-heading{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px}
+.ps-subheading{font-size:14px;color:var(--txt2)}
+.ps-new-btn{display:flex;align-items:center;gap:8px;padding:13px 22px;background:var(--green);color:#000;font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:.2s;white-space:nowrap;font-family:'Inter',sans-serif;flex-shrink:0}
+.ps-new-btn svg{width:16px;height:16px;flex-shrink:0}
+.ps-new-btn:hover{background:#00c49a;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,212,170,.25)}
+.ps-new-btn:active{transform:translateY(0)}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.proj-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:0;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.proj-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.proj-card-stripe{height:4px;width:100%;border-radius:0}
+.proj-card-stripe.conservador{background:linear-gradient(90deg,var(--green),#00b894)}
+.proj-card-stripe.moderado{background:linear-gradient(90deg,var(--purple),#7c3aed)}
+.proj-card-body{padding:22px 22px 18px;flex:1;display:flex;flex-direction:column}
+.proj-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.proj-card-name{font-size:17px;font-weight:700;line-height:1.2}
+.proj-card-del{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px 6px;border-radius:6px;line-height:0;transition:.15s}
+.proj-card-del:hover{color:var(--red);background:var(--red-dim)}
+.proj-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 9px;border-radius:20px;margin-bottom:14px}
+.proj-badge.conservador{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,170,.2)}
+.proj-badge.moderado{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+.proj-card-stats{display:flex;gap:0;margin-bottom:20px;flex:1}
+.proj-stat{flex:1;border-right:1px solid var(--border)}
+.proj-stat:last-child{border-right:none;padding-left:14px}
+.proj-stat:first-child{padding-right:14px}
+.proj-stat:not(:first-child):not(:last-child){padding:0 14px}
+.proj-stat-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.proj-stat-val{font-size:13px;font-weight:600;color:var(--txt)}
+.proj-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border)}
+.proj-card-date{font-size:11px;color:var(--txt3)}
+.proj-open-btn{padding:7px 14px;background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.proj-open-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.ps-empty{text-align:center;padding:80px 20px}
+.ps-empty-icon{font-size:52px;margin-bottom:20px;opacity:.35}
+.ps-empty-title{font-size:22px;font-weight:700;margin-bottom:8px}
+.ps-empty-sub{font-size:14px;color:var(--txt3);margin-bottom:32px;line-height:1.6}
+/* sidebar project indicator */
+.s-project-pill{display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:8px;cursor:pointer;margin-bottom:6px;border:1px solid var(--border);transition:.15s;background:var(--bg-card2)}
+.s-project-pill:hover{border-color:rgba(0,212,170,.3);background:var(--green-dim)}
+.s-project-pill svg{width:12px;height:12px;flex-shrink:0;color:var(--txt3)}
+.s-project-pill-text{font-size:11px;color:var(--txt2);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){
+  .ps-header{padding:16px 20px}
+  .ps-body{padding:28px 20px 60px}
+  .ps-heading{font-size:22px}
+  .proj-grid{grid-template-columns:1fr}
+  .ps-toprow{flex-direction:column;align-items:stretch}
+  .ps-new-btn{justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -420,6 +482,47 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 </div>
 </div>
 
+<!-- ══════════════════ PROJECTS SCREEN ══════════════════ -->
+<div id="projects-screen">
+  <div class="ps-header">
+    <div class="ps-logo">PATRIMONIUM <span>/ Inteligência Patrimonial</span></div>
+    <div class="ps-user-row">
+      <div class="ps-avatar" id="ps-avatar">L</div>
+      <div class="ps-user-info">
+        <div class="ps-name" id="ps-name">Usuário</div>
+        <div class="ps-email" id="ps-email"></div>
+      </div>
+      <button class="ps-logout-btn" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+  <div class="ps-body">
+    <div class="ps-toprow">
+      <div>
+        <div class="ps-heading">Meus Projetos</div>
+        <div class="ps-subheading">Cada projeto tem sua própria carteira, perfil e simulações.</div>
+      </div>
+      <button class="ps-new-btn" onclick="createProject()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Criar projeto
+      </button>
+    </div>
+
+    <!-- Cards de projetos (renderizados via JS) -->
+    <div class="proj-grid" id="proj-grid"></div>
+
+    <!-- Estado vazio -->
+    <div class="ps-empty" id="ps-empty" style="display:none">
+      <div class="ps-empty-icon">📊</div>
+      <div class="ps-empty-title">Nenhum projeto ainda</div>
+      <div class="ps-empty-sub">Crie seu primeiro projeto de investimentos.<br>Cada projeto tem carteira, simulador e análise de saúde próprios.</div>
+      <button class="ps-new-btn" style="margin:0 auto" onclick="createProject()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Criar meu primeiro projeto
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════ ONBOARDING ══════════════════ -->
 <div id="onboarding">
 <div class="ob-wrap">
@@ -434,9 +537,14 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
 
   <!-- STEP 1 -->
   <div class="ob-step show" id="ob1">
-    <div class="ob-eyebrow">Bem-vindo</div>
-    <div class="ob-title">Vamos construir sua inteligência patrimonial.</div>
-    <div class="ob-sub">Responda com precisão. Cada detalhe calibra a IA que gerenciará sua alocação.</div>
+    <div class="ob-eyebrow" id="ob1-eyebrow">Novo Projeto</div>
+    <div class="ob-title" id="ob1-title">Dê um nome para este projeto.</div>
+    <div class="ob-sub" id="ob1-sub">Um projeto representa uma carteira com objetivo específico. Você pode ter vários simultaneamente.</div>
+    <div class="ob-field">
+      <label class="ob-label">Nome do projeto</label>
+      <input class="ob-input" id="ob-project-name" placeholder="Ex: Aposentadoria, Viagem Europa, Reserva…" type="text"
+        onkeydown="if(event.key==='Enter')document.getElementById('ob-name').focus()">
+    </div>
     <div class="ob-field"><label class="ob-label">Seu nome</label><input class="ob-input" id="ob-name" placeholder="Ex: Ricardo Almeida" type="text"></div>
     <div class="ob-row">
       <div class="ob-field"><label class="ob-label">Profissão</label>
@@ -599,6 +707,11 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
     <div class="s-logo">
       <div class="s-logo-mark">PATRIMONIUM</div>
       <div class="s-logo-sub">Inteligência Patrimonial</div>
+    </div>
+    <!-- Indicador de projeto ativo -->
+    <div class="s-project-pill" id="s-project-pill" onclick="goToProjects()" title="Voltar aos projetos">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      <span class="s-project-pill-text" id="s-project-label">Projetos</span>
     </div>
     <div class="s-nav">
       <div class="s-nav-item active" onclick="nav('dashboard',this)">
@@ -886,14 +999,19 @@ let reactionVal = 0;
 
 function obNext(step) {
   if (step === 1) {
-    const n = document.getElementById('ob-name').value.trim();
-    if (!n) { document.getElementById('ob-name').style.borderColor='var(--red)'; return; }
+    const pname = document.getElementById('ob-project-name').value.trim();
+    const n     = document.getElementById('ob-name').value.trim();
+    if (!pname) { document.getElementById('ob-project-name').style.borderColor='var(--red)'; return; }
+    if (!n)     { document.getElementById('ob-name').style.borderColor='var(--red)'; return; }
+    S.projectName = pname;
     S.name = n.split(' ')[0];
   }
   if (step === 2) {
     const w = document.getElementById('ob-wealth').value;
     if (!w) return;
     S.wealth = parseInt(w);
+    const inc = document.getElementById('ob-income').value;
+    S.income = inc ? parseInt(inc) : 0;
   }
   if (step === 3) {
     const h = document.getElementById('ob-horizon').value;
@@ -1703,25 +1821,149 @@ function signInDemo() {
   afterAuth();
 }
 
-// ── Após autenticação ──
+// ══════════════════ PROJECTS ENGINE ══════════════════
+
+function projectsKey() { return 'pat_projects_' + (CURRENT_USER?.email || 'demo'); }
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(projectsKey())) || []; } catch { return []; }
+}
+
+function saveProjects(list) {
+  localStorage.setItem(projectsKey(), JSON.stringify(list));
+}
+
+function deleteProject(id) {
+  if (!confirm('Excluir este projeto? Esta ação não pode ser desfeita.')) return;
+  const updated = getProjects().filter(p => p.id !== id);
+  saveProjects(updated);
+  renderProjectsScreen();
+}
+
+function horizonLabel(h) {
+  return h === 'short' ? 'Curto prazo' : h === 'medium' ? 'Médio prazo' : 'Longo prazo';
+}
+
+function wealthLabel(w) {
+  if (!w) return '—';
+  if (w >= 1000000) return 'R$ ' + (w/1000000).toFixed(1).replace('.',',') + 'M';
+  if (w >= 1000)    return 'R$ ' + (w/1000).toFixed(0) + 'k';
+  return 'R$ ' + w;
+}
+
+function renderProjectsScreen() {
+  const projects = getProjects();
+  const grid     = document.getElementById('proj-grid');
+  const empty    = document.getElementById('ps-empty');
+
+  if (!CURRENT_USER) return;
+  const first = (CURRENT_USER.name || 'Usuário').split(' ')[0];
+  document.getElementById('ps-avatar').textContent = first[0].toUpperCase();
+  document.getElementById('ps-name').textContent   = first;
+  document.getElementById('ps-email').textContent  = CURRENT_USER.isDemo ? 'Modo demonstração' : (CURRENT_USER.email || '');
+
+  if (projects.length === 0) {
+    grid.innerHTML  = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = projects.map(p => {
+    const profile = p.profile || 'conservador';
+    const date    = p.createdAt ? new Date(p.createdAt).toLocaleDateString('pt-BR') : '—';
+    const goals   = (p.goals || []).map(g => ({
+      aposentadoria:'Aposentadoria', renda:'Renda passiva',
+      preservacao:'Preservação', crescimento:'Crescimento'
+    }[g] || g)).slice(0,2).join(', ') || '—';
+    return `
+    <div class="proj-card ${profile}">
+      <div class="proj-card-stripe ${profile}"></div>
+      <div class="proj-card-body">
+        <div class="proj-card-top">
+          <div class="proj-card-name">${p.projectName || 'Projeto'}</div>
+          <button class="proj-card-del" onclick="event.stopPropagation();deleteProject('${p.id}')" title="Excluir projeto">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </div>
+        <div class="proj-badge ${profile}">${profile.charAt(0).toUpperCase()+profile.slice(1)}</div>
+        <div class="proj-card-stats">
+          <div class="proj-stat">
+            <div class="proj-stat-label">Patrimônio</div>
+            <div class="proj-stat-val">${wealthLabel(p.wealth)}</div>
+          </div>
+          <div class="proj-stat">
+            <div class="proj-stat-label">Horizonte</div>
+            <div class="proj-stat-val">${horizonLabel(p.horizon)}</div>
+          </div>
+        </div>
+        <div class="proj-card-footer">
+          <div class="proj-card-date">Criado em ${date}</div>
+          <button class="proj-open-btn" onclick="openProject('${p.id}')">Abrir →</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showProjectsScreen() {
+  document.getElementById('login-screen').style.display    = 'none';
+  document.getElementById('projects-screen').style.display = 'block';
+  document.getElementById('onboarding').style.display      = 'none';
+  document.getElementById('app').classList.remove('show');
+  renderProjectsScreen();
+}
+
+function goToProjects() {
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('projects-screen').style.display = 'block';
+  renderProjectsScreen();
+}
+
+function createProject() {
+  // Prepara onboarding como "novo projeto"
+  S.projectName = '';
+  document.getElementById('ob-project-name').value = '';
+  document.getElementById('ob-name').value          = CURRENT_USER?.name || '';
+  // Reset campos
+  ['ob-wealth','ob-income','ob-reserve','ob-horizon','ob-liquidity'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.querySelectorAll('.ob-goal.sel').forEach(el => {
+    el.classList.remove('sel'); const c = el.querySelector('.ob-check'); if(c) c.textContent='';
+  });
+  selectedGoals = [];
+  // Volta ao step 1
+  document.querySelectorAll('.ob-step').forEach(el => el.classList.remove('show'));
+  document.getElementById('ob1').classList.add('show');
+  obStep = 1;
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('pd'+i).classList.toggle('active', i === 1);
+  }
+  document.getElementById('projects-screen').style.display = 'none';
+  document.getElementById('onboarding').style.display      = 'block';
+  setTimeout(() => document.getElementById('ob-project-name').focus(), 120);
+}
+
+function openProject(id) {
+  const projects = getProjects();
+  const p        = projects.find(x => x.id === id);
+  if (!p) return;
+  Object.assign(S, p);
+  document.getElementById('projects-screen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  // Atualiza label do projeto no sidebar
+  const lbl = document.getElementById('s-project-label');
+  if (lbl) lbl.textContent = p.projectName || 'Projeto';
+  initApp();
+  setTimeout(updateSidebarUser, 120);
+}
+
+// ── Após autenticação ── sempre vai para tela de projetos
 function afterAuth() {
   document.getElementById('login-screen').style.display = 'none';
   S.name = (CURRENT_USER.name || 'Usuário').split(' ')[0];
-  const key   = 'pat_ob_' + (CURRENT_USER.email || 'demo');
-  const saved = localStorage.getItem(key);
-  if (saved) {
-    try {
-      Object.assign(S, JSON.parse(saved));
-      document.getElementById('onboarding').style.display = 'none';
-      document.getElementById('app').classList.add('show');
-      initApp();
-    } catch(e) {
-      document.getElementById('onboarding').style.display = 'block';
-    }
-  } else {
-    document.getElementById('onboarding').style.display = 'block';
-  }
-  setTimeout(updateSidebarUser, 120);
+  showProjectsScreen();
 }
 
 function updateSidebarUser() {
@@ -1746,19 +1988,34 @@ function openSetupModal()  {}
 function closeSetupModal() {}
 function saveClientId()    {}
 
-// ── Salva estado do onboarding por usuário ──
+// ── launchApp: salva como projeto novo e abre ──
 const _origLaunchApp = launchApp;
 launchApp = function() {
   if (CURRENT_USER) {
-    const key = 'pat_ob_' + (CURRENT_USER.email || 'demo');
-    localStorage.setItem(key, JSON.stringify({
-      name: S.name, wealth: S.wealth, profile: S.profile,
-      riskScore: S.riskScore, goals: S.goals,
-      horizon: S.horizon, liquidity: S.liquidity, income: S.income
-    }));
+    const id      = 'proj_' + Date.now();
+    const project = {
+      id,
+      projectName : S.projectName || 'Projeto',
+      name        : S.name,
+      wealth      : S.wealth,
+      income      : S.income,
+      profile     : S.profile,
+      riskScore   : S.riskScore,
+      goals       : S.goals,
+      horizon     : S.horizon,
+      liquidity   : S.liquidity,
+      createdAt   : Date.now()
+    };
+    const list = getProjects();
+    list.push(project);
+    saveProjects(list);
+    S.id = id;  // marca projeto ativo
   }
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('app').classList.add('show');
+  // Atualiza label do sidebar
+  const lbl = document.getElementById('s-project-label');
+  if (lbl) lbl.textContent = S.projectName || 'Projeto';
   initApp();
   setTimeout(updateSidebarUser, 200);
 };
