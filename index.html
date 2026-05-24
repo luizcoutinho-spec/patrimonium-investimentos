@@ -126,6 +126,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .ccard-name{font-size:16px;font-weight:700}
 .ccard-del{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;border-radius:6px;line-height:0;transition:.15s}
 .ccard-del:hover{color:var(--red);background:var(--red-dim)}
+.ccard-edit-btn{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;border-radius:6px;line-height:0;transition:.15s}
+.ccard-edit-btn:hover{color:var(--green);background:var(--green-dim)}
 .ccard-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:14px}
 .ccard-badge.conservador{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,170,.2)}
 .ccard-badge.moderado{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
@@ -1527,6 +1529,12 @@ function nav(view, el) {
 // ══════════════════ DASHBOARD CHARTS ══════════════════
 function initDashboardCharts() { refreshDashboard(); }
 
+// Atualiza tudo: dashboard geral + workspace (se aberto) + lista de carteiras
+function refreshAll() {
+  refreshAll();
+  if (_activeCarteira) initCwsDashboard();
+}
+
 function refreshDashboard() {
   // ── Coletar todos os ativos de todas as carteiras ──
   const carteiras  = getCarteiras();
@@ -1772,10 +1780,15 @@ function renderCarteirasList() {
       <div class="ccard-stripe ${profile}"></div>
       <div class="ccard-body">
         <div class="ccard-top">
-          <div class="ccard-name">${c.name}${isPrinc ? ' <span style="font-size:10px;color:var(--txt3);font-weight:400">(perfil)</span>' : ''}</div>
-          ${isPrinc ? '' : `<button class="ccard-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-          </button>`}
+          <div class="ccard-name" id="ccard-name-${c.id}">${c.name}${isPrinc ? ' <span style="font-size:10px;color:var(--txt3);font-weight:400">(perfil)</span>' : ''}</div>
+          ${isPrinc ? '' : `<div style="display:flex;gap:4px;align-items:center">
+            <button class="ccard-edit-btn" onclick="event.stopPropagation();renameCarteiraCard('${c.id}')" title="Renomear">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="ccard-del" onclick="event.stopPropagation();deleteCarteira('${c.id}')" title="Excluir">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            </button>
+          </div>`}
         </div>
         <div class="ccard-badge ${profile}">${profLabel}</div>
         <div class="ccard-stats">
@@ -1824,6 +1837,45 @@ function openCarteiraWs(id) {
 
   // Navega para visão geral da carteira
   cwsNav('dashboard', document.getElementById('cws-nav-dashboard'));
+}
+
+// Rename direto no card da lista de carteiras
+function renameCarteiraCard(id) {
+  const nameEl = document.getElementById('ccard-name-' + id);
+  if (!nameEl) return;
+  const list    = getCarteiras();
+  const carteira= list.find(c => c.id === id);
+  if (!carteira) return;
+  const current = carteira.name;
+
+  // Substitui o div por um input inline
+  const inp = document.createElement('input');
+  inp.className = 's-cws-edit-input';
+  inp.value     = current;
+  inp.style.cssText = 'width:100%;max-width:160px;margin:0;font-size:14px;padding:3px 7px';
+  nameEl.style.display = 'none';
+  nameEl.parentElement.insertBefore(inp, nameEl);
+  inp.focus(); inp.select();
+
+  function commit() {
+    const val = inp.value.trim();
+    if (val && val !== current) {
+      carteira.name = val;
+      saveCarteiras(list);
+      // Se for a carteira ativa, atualiza sidebar e topbar também
+      if (_activeCarteira && _activeCarteira.id === id) {
+        _activeCarteira.name = val;
+        const sEl = document.getElementById('s-cws-name');
+        if (sEl) sEl.textContent = val;
+        document.getElementById('tb-title').textContent = val;
+      }
+    }
+    inp.remove();
+    nameEl.style.display = '';
+    renderCarteirasList();
+  }
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } if (e.key === 'Escape') { inp.value = current; commit(); } });
+  inp.addEventListener('blur', commit);
 }
 
 function startRenameCarteira() {
@@ -3323,8 +3375,7 @@ function saveBulkAdd() {
   saveAtivos(cid, ativos);
   closeBulkAdd();
   atvTab('mine');
-  refreshDashboard();
-  renderCarteirasList();
+  refreshAll();
 }
 
 function saveAddAtivo() {
@@ -3345,16 +3396,14 @@ function saveAddAtivo() {
   saveAtivos(cid, ativos);
   closeAddAtivoModal();
   atvTab('mine');
-  refreshDashboard();
-  renderCarteirasList();
+  refreshAll();
 }
 
 function removeAtivo(cid, uid) {
   if (!confirm('Remover este ativo da carteira?')) return;
   saveAtivos(cid, getAtivos(cid).filter(a => a.uid !== uid));
   renderMinhaCarteira();
-  refreshDashboard();
-  renderCarteirasList();
+  refreshAll();
 }
 function saveClientId()    {}
 
