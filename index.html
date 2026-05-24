@@ -146,7 +146,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .s-cws-back:hover{color:var(--txt);background:var(--bg-hover)}
 .s-cws-back svg{width:13px;height:13px;flex-shrink:0}
 .s-cws-info{padding:10px 12px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;margin-bottom:12px}
-.s-cws-name{font-size:13px;font-weight:700;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-cws-name-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.s-cws-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.s-cws-edit-btn{flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--txt3);padding:2px;border-radius:4px;display:flex;align-items:center;transition:.15s}
+.s-cws-edit-btn:hover{color:var(--green)}
+.s-cws-edit-input{width:100%;background:var(--bg-input,#0f1421);border:1px solid var(--green);border-radius:6px;color:var(--txt);font-size:13px;font-weight:700;font-family:'Inter',sans-serif;padding:3px 7px;outline:none;margin-bottom:4px}
 .s-cws-badge{display:inline-flex;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
 .s-cws-badge.conservador{background:var(--green-dim);color:var(--green)}
 .s-cws-badge.moderado{background:var(--purple-dim);color:var(--purple)}
@@ -935,7 +939,12 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
         Carteiras
       </button>
       <div class="s-cws-info">
-        <div class="s-cws-name" id="s-cws-name">Carteira</div>
+        <div class="s-cws-name-row">
+          <div class="s-cws-name" id="s-cws-name">Carteira</div>
+          <button class="s-cws-edit-btn" id="s-cws-edit-btn" onclick="startRenameCarteira()" title="Renomear carteira">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
         <div class="s-cws-badge conservador" id="s-cws-badge">Conservador</div>
       </div>
       <div class="s-nav-item active" id="cws-nav-dashboard" onclick="cwsNav('dashboard',this)">
@@ -1799,6 +1808,45 @@ function openCarteiraWs(id) {
 
   // Navega para visão geral da carteira
   cwsNav('dashboard', document.getElementById('cws-nav-dashboard'));
+}
+
+function startRenameCarteira() {
+  if (!_activeCarteira || _activeCarteira.id === 'principal') return;
+  const nameEl = document.getElementById('s-cws-name');
+  const btnEl  = document.getElementById('s-cws-edit-btn');
+  const current = _activeCarteira.name;
+
+  // Substituir texto por input
+  nameEl.style.display = 'none';
+  btnEl.style.display  = 'none';
+  const row = nameEl.parentElement;
+  const inp = document.createElement('input');
+  inp.className   = 's-cws-edit-input';
+  inp.value       = current;
+  inp.id          = 's-cws-rename-input';
+  row.insertBefore(inp, nameEl);
+  inp.focus();
+  inp.select();
+
+  function commit() {
+    const val = inp.value.trim();
+    if (val && val !== current) {
+      // Salvar no storage
+      const list = getCarteiras();
+      const idx  = list.findIndex(c => c.id === _activeCarteira.id);
+      if (idx >= 0) { list[idx].name = val; saveCarteiras(list); }
+      _activeCarteira.name = val;
+      nameEl.textContent = val;
+      document.getElementById('tb-title').textContent = val;
+      renderCarteirasList();
+    }
+    inp.remove();
+    nameEl.style.display = '';
+    btnEl.style.display  = '';
+  }
+
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } if (e.key === 'Escape') { inp.value = current; commit(); } });
+  inp.addEventListener('blur', commit);
 }
 
 function exitCarteiraWs() {
