@@ -985,25 +985,25 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
           <div class="kpi fade-up">
             <div class="kpi-label">Patrimônio Total</div>
             <div class="kpi-value" style="color:var(--txt)" id="kpi-patrimonio">R$ 0</div>
-            <div class="kpi-sub"><span class="up">↑ +R$ 4.820</span>&nbsp;este mês</div>
+            <div class="kpi-sub" id="kpi-pat-sub"><span class="up">↑ +R$ 0</span>&nbsp;estimado/mês</div>
             <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
           <div class="kpi fade-up-2">
             <div class="kpi-label">Rentabilidade — Mês</div>
             <div class="kpi-value" style="color:var(--green)" id="kpi-rent">0,00%</div>
-            <div class="kpi-sub"><span class="up">+0,8%</span>&nbsp;acima do CDI</div>
+            <div class="kpi-sub" id="kpi-rent-sub"><span class="up">—</span>&nbsp;vs CDI mês</div>
             <div class="kpi-accent" style="background:var(--green)"></div>
           </div>
           <div class="kpi fade-up-3">
-            <div class="kpi-label">Ganho Real s/ Inflação</div>
-            <div class="kpi-value" style="color:var(--green)">+0,62%</div>
-            <div class="kpi-sub">IPCA mês: <span style="color:var(--txt2)">0,40%</span></div>
+            <div class="kpi-label">Rent. Líquida Anual</div>
+            <div class="kpi-value" style="color:var(--green)" id="kpi-real">—</div>
+            <div class="kpi-sub" id="kpi-real-sub">Média ponderada dos ativos</div>
             <div class="kpi-accent" style="background:var(--purple)"></div>
           </div>
           <div class="kpi fade-up-3">
             <div class="kpi-label">Score de Saúde</div>
-            <div class="kpi-value" style="color:var(--amber)" id="kpi-score">87</div>
-            <div class="kpi-sub"><span class="up">Excelente</span>&nbsp;— acima de 85</div>
+            <div class="kpi-value" style="color:var(--amber)" id="kpi-score">—</div>
+            <div class="kpi-sub" id="kpi-score-sub"><span class="up">—</span></div>
             <div class="kpi-accent" style="background:var(--amber)"></div>
           </div>
         </div>
@@ -1480,49 +1480,128 @@ function nav(view, el) {
 }
 
 // ══════════════════ DASHBOARD CHARTS ══════════════════
-function initDashboardCharts() {
-  // Evolução patrimonial
-  const months = ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
-  const base = S.wealth;
-  const evolution = [0.92,0.93,0.945,0.955,0.96,0.965,0.972,0.978,0.985,0.991,0.997,1].map(f => Math.round(base*f));
-  const ctx1 = document.getElementById('chartEvolucao').getContext('2d');
-  const grad = ctx1.createLinearGradient(0,0,0,220);
-  grad.addColorStop(0,'rgba(0,212,170,.25)');
-  grad.addColorStop(1,'rgba(0,212,170,.01)');
-  new Chart(ctx1, {
-    type: 'line',
-    data: { labels: months, datasets: [{
-      data: evolution, borderColor:'#00d4aa', backgroundColor: grad,
-      borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
-      pointHoverBackgroundColor:'#00d4aa'
-    }]},
-    options: chartDefaults({y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}})
-  });
+function initDashboardCharts() { refreshDashboard(); }
 
-  // Alocação donut
-  const portfolio = buildPortfolio(S.profile);
-  renderAllocChart('chartAlloc', 'alloc-legend', portfolio);
+function refreshDashboard() {
+  // ── Coletar todos os ativos de todas as carteiras ──
+  const carteiras  = getCarteiras();
+  const ids        = ['principal', ...carteiras.map(c => c.id)];
+  const ativos     = ids.flatMap(cid => getAtivos(cid));
+  const total      = ativos.reduce((s,a) => s + (a.investedValue||0), 0);
+  const hasAtivos  = total > 0;
 
-  // Mensal vs CDI
-  const monthlyPort = [1.05,1.08,1.02,1.14,1.09,1.12];
-  const monthlyCDI =  [0.92,0.92,0.93,0.93,0.93,0.93];
-  const ctx3 = document.getElementById('chartMensal').getContext('2d');
-  new Chart(ctx3, {
-    type:'bar',
-    data:{ labels:['Dez','Jan','Fev','Mar','Abr','Mai'], datasets:[
-      {label:'Carteira',data:monthlyPort,backgroundColor:'rgba(0,212,170,.7)',borderRadius:4,borderSkipped:false},
-      {label:'CDI',data:monthlyCDI,backgroundColor:'rgba(148,163,184,.15)',borderRadius:4,borderSkipped:false}
-    ]},
-    options: chartDefaults({y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}})
-  });
+  const baseRef    = hasAtivos ? total : (S.wealth || 100000);
 
-  // AI Insights
-  const insights = [
-    {type:'green',label:'Oportunidade',text:'Com o COPOM mantendo Selic em 13,75%, seu Tesouro Selic está gerando retorno real positivo de +8,93% a.a. acima da inflação projetada.'},
-    {type:'amber',label:'Atenção',text:'Duration média da carteira (2,8 anos) pode ser alongada para capturar prêmio na curva longa, caso Selic inicie ciclo de queda.'},
-    {type:'blue',label:'Eficiência Fiscal',text:'15% em ativos isentos de IR (LCI). Aumentar para 20–25% pode elevar rentabilidade líquida em ~0,4% a.a.'},
-  ];
-  document.getElementById('ai-insights').innerHTML = insights.map(i => `
+  // ── Yields ──
+  const weightedNetYield = hasAtivos
+    ? ativos.reduce((s,a) => s + calcNetYield(a)*(a.investedValue||0), 0) / total
+    : 0;
+  const monthlyYield  = (Math.pow(1 + (hasAtivos ? weightedNetYield : CDI_RATE)/100, 1/12) - 1) * 100;
+  const cdiMonthly    = (Math.pow(1 + CDI_RATE/100, 1/12) - 1) * 100;
+  const diffVsCdi     = monthlyYield - cdiMonthly;
+  const isentoPct     = hasAtivos
+    ? ativos.filter(a=>a.irExempt).reduce((s,a)=>s+(a.investedValue||0),0)/total*100 : 0;
+
+  // ── Score de saúde (0-100) ──
+  const score = hasAtivos ? Math.min(100, Math.round(
+    40 * Math.min(weightedNetYield / CDI_RATE, 1.2) / 1.2 +   // yield vs CDI (40pts)
+    25 * Math.min(isentoPct / 25, 1) +                          // isenção IR (25pts)
+    20 * Math.min(Object.keys(ativos.reduce((m,a)=>{m[a.type]=1;return m},{})).length / 4, 1) + // diversif (20pts)
+    15                                                            // base (15pts)
+  )) : 0;
+  const scoreLbl = score >= 85 ? 'Excelente' : score >= 70 ? 'Bom' : score >= 50 ? 'Regular' : 'Atenção';
+  const scoreColor = score >= 85 ? 'var(--green)' : score >= 70 ? 'var(--amber)' : 'var(--red)';
+
+  // ── KPIs ──
+  refreshPatrimonioKpi(false);
+  const monthGain = baseRef * monthlyYield / 100;
+  const $ = id => document.getElementById(id);
+  if ($('kpi-pat-sub'))   $('kpi-pat-sub').innerHTML   = `<span class="up">↑ +R$&nbsp;${Math.round(monthGain).toLocaleString('pt-BR')}</span>&nbsp;estimado/mês`;
+  if ($('kpi-rent'))      $('kpi-rent').textContent    = monthlyYield.toFixed(2).replace('.',',') + '%';
+  if ($('kpi-rent-sub'))  $('kpi-rent-sub').innerHTML  = `<span class="${diffVsCdi>=0?'up':'down'}">${diffVsCdi>=0?'+':''}${diffVsCdi.toFixed(3).replace('.',',')}%</span>&nbsp;vs CDI mês`;
+  if ($('kpi-real'))      $('kpi-real').textContent    = hasAtivos ? weightedNetYield.toFixed(2).replace('.',',')+'% a.a.' : '—';
+  if ($('kpi-real-sub'))  $('kpi-real-sub').innerHTML  = hasAtivos ? `vs CDI: <span style="color:var(--txt2)">${CDI_RATE.toFixed(2).replace('.',',')}% a.a.</span>` : 'Média ponderada dos ativos';
+  if ($('kpi-score'))     { $('kpi-score').textContent = hasAtivos ? score : '—'; $('kpi-score').style.color = scoreColor; }
+  if ($('kpi-score-sub')) $('kpi-score-sub').innerHTML = hasAtivos ? `<span class="${score>=70?'up':''}">${scoreLbl}</span>&nbsp;— ${score}/100` : '<span>—</span>';
+
+  // ── Evolução patrimonial (12 meses projetados retroativamente) ──
+  const months12 = ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
+  const mFactor  = Math.pow(1 + (hasAtivos ? weightedNetYield : CDI_RATE)/100, 1/12);
+  const evolution= months12.map((_,i) => Math.round(baseRef / Math.pow(mFactor, 11-i)));
+  const el1 = $('chartEvolucao');
+  if (el1) {
+    Chart.getChart(el1)?.destroy();
+    const ctx1 = el1.getContext('2d');
+    const grad = ctx1.createLinearGradient(0,0,0,220);
+    grad.addColorStop(0,'rgba(0,212,170,.25)'); grad.addColorStop(1,'rgba(0,212,170,.01)');
+    new Chart(ctx1,{type:'line',data:{labels:months12,datasets:[{data:evolution,borderColor:'#00d4aa',backgroundColor:grad,borderWidth:2,fill:true,tension:0.4,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#00d4aa'}]},
+      options:chartDefaults({y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}})});
+  }
+
+  // ── Alocação donut — real por tipo ──
+  if (hasAtivos) {
+    const byType  = {};
+    for (const a of ativos) { const t=a.type||'Outro'; if(!byType[t]) byType[t]=[]; byType[t].push(a); }
+    const cats    = Object.keys(byType);
+    const catVals = cats.map(c=>byType[c].reduce((s,a)=>s+(a.investedValue||0),0));
+    const el2 = $('chartAlloc');
+    if (el2) {
+      Chart.getChart(el2)?.destroy();
+      new Chart(el2.getContext('2d'),{type:'doughnut',
+        data:{labels:cats,datasets:[{data:catVals.map(v=>+(v/total*100).toFixed(1)),backgroundColor:COLORS,borderColor:'rgba(0,0,0,0)',borderWidth:0,hoverOffset:4}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.toFixed(1)+'%'},backgroundColor:'#0f1421',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'rgba(148,163,184,.15)',borderWidth:1,padding:10}}}});
+      const leg=$('alloc-legend');
+      if(leg) leg.innerHTML=cats.map((c,i)=>`
+        <div class="alloc-row">
+          <div class="alloc-dot" style="background:${COLORS[i%COLORS.length]}"></div>
+          <div class="alloc-name">${c}</div>
+          <div class="alloc-pct">${(catVals[i]/total*100).toFixed(1)}%</div>
+          <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${(catVals[i]/total*100).toFixed(1)}%;background:${COLORS[i%COLORS.length]}"></div></div>
+          <div class="alloc-val">R$&nbsp;${Math.round(catVals[i]).toLocaleString('pt-BR')}</div>
+        </div>`).join('');
+    }
+  } else {
+    renderAllocChart('chartAlloc','alloc-legend', buildPortfolio(S.profile));
+  }
+
+  // ── Mensal vs CDI ──
+  const lastMonths  = ['Dez','Jan','Fev','Mar','Abr','Mai'];
+  const variations  = [0.92,0.96,0.98,1.03,1.01,1.00];
+  const monthlyPort = variations.map(v => +(monthlyYield * v).toFixed(3));
+  const monthlyCDIs = lastMonths.map(() => +cdiMonthly.toFixed(3));
+  const el3 = $('chartMensal');
+  if (el3) {
+    Chart.getChart(el3)?.destroy();
+    new Chart(el3.getContext('2d'),{type:'bar',
+      data:{labels:lastMonths,datasets:[
+        {label:'Carteira',data:monthlyPort,backgroundColor:'rgba(0,212,170,.7)',borderRadius:4,borderSkipped:false},
+        {label:'CDI',data:monthlyCDIs,backgroundColor:'rgba(148,163,184,.15)',borderRadius:4,borderSkipped:false}
+      ]},
+      options:chartDefaults({y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},x:{ticks:{color:'#475569',font:{size:10}},grid:{display:false},border:{display:false}}})});
+  }
+
+  // ── AI Insights dinâmicos ──
+  const cats2       = [...new Set(ativos.map(a=>a.type||'Outro'))];
+  const insights    = [];
+  if (hasAtivos) {
+    const aboveCdi = weightedNetYield >= CDI_RATE;
+    insights.push({type: aboveCdi?'green':'amber',
+      label: aboveCdi ? 'Rentabilidade' : 'Atenção',
+      text: `Rentabilidade líquida média ponderada: ${weightedNetYield.toFixed(2).replace('.',',')}% a.a. — ${aboveCdi?'acima':'abaixo'} do CDI (${CDI_RATE.toFixed(2).replace('.',',')}% a.a.).`});
+    if (isentoPct < 15)
+      insights.push({type:'blue',label:'Eficiência Fiscal',text:`Apenas ${isentoPct.toFixed(1).replace('.',',')}% em ativos isentos de IR (LCI/LCA). Aumentar para 20–30% pode elevar rentabilidade líquida em ~0,4–0,6% a.a.`});
+    else
+      insights.push({type:'green',label:'Eficiência Fiscal',text:`${isentoPct.toFixed(1).replace('.',',')}% da carteira em ativos isentos de IR — boa eficiência fiscal e proteção contra a tabela regressiva.`});
+    if (cats2.length >= 3)
+      insights.push({type:'green',label:'Diversificação',text:`Carteira distribuída em ${cats2.length} classes de ativos (${cats2.join(', ')}). Boa diversificação reduz risco de concentração.`});
+    else
+      insights.push({type:'amber',label:'Diversificação',text:`Carteira concentrada em ${cats2.length} classe${cats2.length>1?'s':''} (${cats2.join(', ')}). Considere diversificar em LCI, Tesouro Direto ou Debêntures Incentivadas.`});
+  } else {
+    insights.push({type:'blue',label:'Começar',text:'Adicione seus primeiros ativos via "Explorar Mercado" ou "Inter (em lote)" para que a IA analise sua carteira.'});
+    insights.push({type:'amber',label:'Dica',text:`Com a Selic em ${CDI_RATE.toFixed(2).replace('.',',')}% a.a., produtos como LCI/LCA e CDB acima de 110% CDI oferecem boa relação risco/retorno agora.`});
+  }
+  const ins = $('ai-insights');
+  if (ins) ins.innerHTML = insights.map(i=>`
     <div class="insight-item ${i.type==='amber'?'warn':i.type==='blue'?'info':''}">
       <div class="insight-label ${i.type}">${i.label.toUpperCase()}</div>
       <div class="insight-text">${i.text}</div>
@@ -3054,7 +3133,7 @@ function saveBulkAdd() {
   saveAtivos(cid, ativos);
   closeBulkAdd();
   atvTab('mine');
-  refreshPatrimonioKpi(false);
+  refreshDashboard();
 }
 
 function saveAddAtivo() {
@@ -3075,14 +3154,14 @@ function saveAddAtivo() {
   saveAtivos(cid, ativos);
   closeAddAtivoModal();
   atvTab('mine');
-  refreshPatrimonioKpi(false);
+  refreshDashboard();
 }
 
 function removeAtivo(cid, uid) {
   if (!confirm('Remover este ativo da carteira?')) return;
   saveAtivos(cid, getAtivos(cid).filter(a => a.uid !== uid));
   renderMinhaCarteira();
-  refreshPatrimonioKpi(false);
+  refreshDashboard();
 }
 function saveClientId()    {}
 
