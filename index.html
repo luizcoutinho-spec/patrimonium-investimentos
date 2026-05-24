@@ -120,6 +120,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .ccard-stripe{height:3px}
 .ccard-stripe.conservador{background:linear-gradient(90deg,var(--green),#00b894)}
 .ccard-stripe.moderado{background:linear-gradient(90deg,var(--purple),#7c3aed)}
+.ccard-stripe.agressivo{background:linear-gradient(90deg,var(--red),#e11d48)}
 .ccard-body{padding:20px}
 .ccard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
 .ccard-name{font-size:16px;font-weight:700}
@@ -128,6 +129,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .ccard-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:14px}
 .ccard-badge.conservador{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,170,.2)}
 .ccard-badge.moderado{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+.ccard-badge.agressivo{background:var(--red-dim);color:var(--red);border:1px solid rgba(244,63,94,.2)}
 .ccard-stats{display:flex;gap:16px;margin-bottom:16px}
 .ccard-stat-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
 .ccard-stat-val{font-size:13px;font-weight:600}
@@ -148,18 +150,46 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',
 .s-cws-badge{display:inline-flex;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
 .s-cws-badge.conservador{background:var(--green-dim);color:var(--green)}
 .s-cws-badge.moderado{background:var(--purple-dim);color:var(--purple)}
+.s-cws-badge.agressivo{background:var(--red-dim);color:var(--red)}
 /* ── WORKSPACE DASH ── */
 .cws-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
 @media(max-width:900px){.cws-kpi-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.cws-kpi-grid{grid-template-columns:1fr}}
 /* ── NOVA CARTEIRA MODAL ── */
-.nc-profiles{display:flex;gap:10px;margin-top:2px}
-.nc-opt{flex:1;padding:13px 14px;border:1.5px solid var(--border2);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
+.nc-profiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:2px}
+.nc-opt{flex:1;padding:11px 12px;border:1.5px solid var(--border2);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
 .nc-opt:hover{background:var(--bg-hover)}
 .nc-opt.sel.conservador{border-color:var(--green);background:var(--green-dim)}
 .nc-opt.sel.moderado{border-color:var(--purple);background:var(--purple-dim)}
-.nc-opt-title{font-size:13px;font-weight:600;margin-bottom:2px}
-.nc-opt-sub{font-size:11px;color:var(--txt3)}
+.nc-opt.sel.agressivo{border-color:var(--red);background:var(--red-dim)}
+.nc-opt-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.nc-opt-sub{font-size:10px;color:var(--txt3)}
+/* Top 3 recomendações */
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.top3-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;position:relative;transition:.15s}
+.top3-card.rank-1{border-color:rgba(0,212,170,.3);background:linear-gradient(145deg,rgba(0,212,170,.07) 0%,var(--bg-card) 60%)}
+.top3-card.rank-2{border-color:rgba(148,163,184,.18)}
+.top3-card.rank-3{border-color:rgba(245,158,11,.18);background:linear-gradient(145deg,rgba(245,158,11,.04) 0%,var(--bg-card) 60%)}
+.top3-rank{font-size:20px;margin-bottom:6px}
+.top3-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;line-height:1.35}
+.top3-bank{font-size:11px;color:var(--txt2);margin-bottom:10px;display:flex;align-items:center;gap:4px}
+.top3-yield{font-size:20px;font-weight:800;font-family:'DM Mono',monospace;margin-bottom:1px}
+.top3-yield-label{font-size:10px;color:var(--txt3);margin-bottom:10px}
+.top3-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;flex:1}
+.top3-add-btn{width:100%;background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,170,.2);border-radius:7px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;margin-top:auto}
+.top3-add-btn:hover{background:rgba(0,212,170,.2);border-color:rgba(0,212,170,.4)}
+/* Comparação direta de bancos */
+.bank-compare-section{margin-bottom:18px}
+.bank-compare-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:10px}
+.bank-compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bank-cmp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 15px}
+.bank-cmp-name{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.bank-cmp-bank{font-size:11px;color:var(--txt2);margin-bottom:10px;display:flex;align-items:center;gap:4px}
+.bank-cmp-yield{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green);margin-bottom:2px}
+.bank-cmp-sub{font-size:10px;color:var(--txt3);margin-bottom:10px}
+.bank-cmp-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.bank-cmp-add{width:100%;background:transparent;border:1px solid var(--border2);color:var(--txt2);font-size:11px;font-weight:600;border-radius:6px;padding:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+.bank-cmp-add:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
 /* ── LOGOUT BTN ── */
 .s-logout{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:12px;font-weight:500;transition:.15s;background:transparent;border:none;font-family:'Inter',sans-serif;margin-top:8px}
 .s-logout:hover{color:var(--red);background:var(--red-dim)}
@@ -605,12 +635,16 @@ input[type=range].sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:
     <label class="lf-label">Perfil de risco</label>
     <div class="nc-profiles">
       <div class="nc-opt conservador sel" id="nc-opt-cons" onclick="selectNcProfile('conservador')">
-        <div class="nc-opt-title">Conservador</div>
+        <div class="nc-opt-title">🛡️ Conservador</div>
         <div class="nc-opt-sub">Proteção + renda estável</div>
       </div>
       <div class="nc-opt moderado" id="nc-opt-mod" onclick="selectNcProfile('moderado')">
-        <div class="nc-opt-title">Moderado</div>
+        <div class="nc-opt-title">⚖️ Moderado</div>
         <div class="nc-opt-sub">Equilíbrio risco/retorno</div>
+      </div>
+      <div class="nc-opt agressivo" id="nc-opt-agr" onclick="selectNcProfile('agressivo')">
+        <div class="nc-opt-title">🚀 Agressivo</div>
+        <div class="nc-opt-sub">Máximo retorno longo prazo</div>
       </div>
     </div>
   </div>
@@ -1215,6 +1249,13 @@ function buildPortfolio(profile, liquidity, horizon) {
       {name:'CDB Nubank 112% CDI', type:'Renda Fixa Privada', pct:20, rate:'15,29% a.a.', venc:'31/12/2026', liq:'No venc.', tag:'tag-blue', tagTxt:'FGC', color:COLORS[2]},
       {name:'LCA Banco do Brasil 90% CDI', type:'Letra de Crédito', pct:15, rate:'12,29% (isento IR)', venc:'30/06/2026', liq:'No venc.', tag:'tag-amber', tagTxt:'FGC', color:COLORS[3]},
       {name:'Debênture Equatorial IPCA+7,5%', type:'Debênture Incentivada', pct:10, rate:'IPCA + 7,50%', venc:'15/12/2030', liq:'Mercado', tag:'tag-purple', tagTxt:'Isento IR', color:COLORS[4]},
+    ],
+    agressivo: [
+      {name:'Tesouro IPCA+ 2035', type:'Título Soberano', pct:30, rate:'IPCA + 7,10%', venc:'15/05/2035', liq:'D+1', tag:'tag-green', tagTxt:'Soberano', color:COLORS[0]},
+      {name:'Tesouro Prefixado 2031', type:'Título Soberano', pct:20, rate:'15,20% a.a.', venc:'01/01/2031', liq:'D+1', tag:'tag-green', tagTxt:'Soberano', color:COLORS[1]},
+      {name:'CDB BTG 116% CDI', type:'Renda Fixa Privada', pct:15, rate:'16,99% a.a.', venc:'31/12/2027', liq:'No venc.', tag:'tag-blue', tagTxt:'FGC', color:COLORS[2]},
+      {name:'Deb. ENGIE IPCA+7,8%', type:'Debênture Incentivada', pct:20, rate:'IPCA + 7,80%', venc:'15/09/2030', liq:'Mercado', tag:'tag-purple', tagTxt:'Isento IR', color:COLORS[3]},
+      {name:'CDB XP IPCA+7,2%', type:'Renda Fixa Privada', pct:15, rate:'IPCA + 7,20%', venc:'15/12/2028', liq:'No venc.', tag:'tag-blue', tagTxt:'FGC', color:COLORS[4]},
     ]
   };
   return profiles[profile] || profiles.conservador;
@@ -1282,19 +1323,21 @@ function selectOpt(el, groupId) {
   reactionVal = parseInt(el.dataset.val);
 }
 function calcProfile() {
-  const r = S.riskScore;
+  const r   = S.riskScore;  // 1–4
   const liq = S.liquidity;
   const hor = S.horizon;
-  if (r <= 2 || (r <= 3 && liq === 'high')) { S.profile = 'conservador'; }
-  else if (r <= 3) { S.profile = 'conservador'; }
-  else { S.profile = 'moderado'; }
+  if (r <= 2 || liq === 'high') { S.profile = 'conservador'; }
+  else if (r === 3 || (r === 4 && hor === 'short')) { S.profile = 'moderado'; }
+  else { S.profile = 'agressivo'; }
 }
 function buildResultStep() {
   const profiles = {
     conservador: { name:'Conservador', full:'Conservador Inteligente',
       desc:'Seu perfil prioriza preservação de capital e estabilidade. A IA alocará predominantemente em ativos soberanos e de alta qualidade de crédito, com foco em proteção inflacionária e liquidez estratégica.' },
     moderado: { name:'Moderado', full:'Moderado Estratégico',
-      desc:'Seu perfil equilibra crescimento e proteção. A IA diversificará entre títulos soberanos de maior duration e crédito privado de qualidade, maximizando retorno real ajustado ao risco.' }
+      desc:'Seu perfil equilibra crescimento e proteção. A IA diversificará entre títulos soberanos de maior duration e crédito privado de qualidade, maximizando retorno real ajustado ao risco.' },
+    agressivo: { name:'Agressivo', full:'Agressivo Estratégico',
+      desc:'Seu perfil busca máxima rentabilidade com tolerância elevada a risco e volatilidade. A IA alocará em ativos de maior duration, debêntures incentivadas premium e crédito privado de alto retorno, maximizando o ganho real no longo prazo.' }
   };
   const p = profiles[S.profile];
   document.getElementById('ob-result-title').textContent = 'Seu perfil: ' + p.full;
@@ -1482,6 +1525,7 @@ function selectNcProfile(p) {
   _ncProfile = p;
   document.getElementById('nc-opt-cons').classList.toggle('sel', p==='conservador');
   document.getElementById('nc-opt-mod').classList.toggle('sel',  p==='moderado');
+  document.getElementById('nc-opt-agr').classList.toggle('sel',  p==='agressivo');
 }
 
 function saveNovaCarteira() {
@@ -2590,18 +2634,19 @@ function renderExploracao() {
   const banks   = [...new Set(BANK_CATALOG.map(a=>a.bank))];
   const tipos   = [...new Set(BANK_CATALOG.map(a=>a.type))];
   const garants = ['FGC','Soberano','Sem garantia'];
+  const rankEmoji = ['🥇','🥈','🥉'];
 
-  // Monta filtros
+  // ── Filtros ──
   let fHtml = `<span class="filter-label">Banco</span>`;
-  banks.forEach(b => fHtml += `<button class="filter-chip${_ativoFilters.banco===b?' active':''}" onclick="toggleAtvFilter('banco','${b.replace(/'/g,"\\'")}')">${b}</button>`);
+  banks.forEach(b => fHtml += `<button class="filter-chip${_ativoFilters.banco===b?' active':''}" onclick="toggleAtvFilter('banco','${b.replace(/'/g,"\\'")}')"><span class="bank-dot" style="background:${BANK_CATALOG.find(x=>x.bank===b)?.bColor||'#888'}"></span> ${b}</button>`);
   fHtml += `<span class="filter-label" style="margin-left:6px">Tipo</span>`;
   tipos.forEach(t => fHtml += `<button class="filter-chip${_ativoFilters.tipo===t?' active':''}" onclick="toggleAtvFilter('tipo','${t}')">${t}</button>`);
   fHtml += `<span class="filter-label" style="margin-left:6px">Garantia</span>`;
-  garants.forEach(g => fHtml += `<button class="filter-chip${_ativoFilters.garantia===g?' active':''}" onclick="toggleAtvFilter('garantia','${g.replace(/'/g,"\\'")}')">${g}</button>`);
+  garants.forEach(g => fHtml += `<button class="filter-chip${_ativoFilters.garantia===g?' active':''}" onclick="toggleAtvFilter('garantia','${g.replace(/'/g,"\\'")}')"> ${g}</button>`);
   fHtml += `<button class="filter-chip${_ativoFilters.isento==='1'?' active':''}" style="margin-left:6px" onclick="toggleAtvFilter('isento','1')">🟢 Isento IR</button>`;
   document.getElementById('catalog-filters').innerHTML = fHtml;
 
-  // Filtra + ordena por rentabilidade líquida desc
+  // ── Filtra + ordena ──
   let list = BANK_CATALOG.filter(a => {
     if (_ativoFilters.banco    && a.bank     !== _ativoFilters.banco)    return false;
     if (_ativoFilters.tipo     && a.type     !== _ativoFilters.tipo)     return false;
@@ -2610,44 +2655,98 @@ function renderExploracao() {
     return true;
   });
   list.sort((a,b) => calcNetYield(b) - calcNetYield(a));
-  const bestId = list.length ? list[0].id : null;
 
-  // Card de recomendação
-  if (list.length) {
-    const best = list[0];
-    const net  = calcNetYield(best);
-    const eqBruto = net >= 1 ? (net / (1-calcIRRate(best.days))).toFixed(1).replace('.',',') : '—';
-    document.getElementById('explore-rec-card').innerHTML = `
-      <div class="rec-card">
-        <div style="flex:1;min-width:200px">
-          <div class="rec-badge">⭐ Melhor rentabilidade — ${list.length} produto${list.length!==1?'s':''} analisado${list.length!==1?'s':''}</div>
-          <div class="rec-name">${best.name}</div>
-          <div class="rec-bank"><span class="bank-dot" style="background:${best.bColor}"></span>${best.bank}&nbsp;·&nbsp;${best.type}&nbsp;·&nbsp;${best.prazo}</div>
-          <div class="rec-stats">
-            <div><div class="rec-stat-val">${fmtYield(net)}</div><div class="rec-stat-label">Rentabilidade líquida</div></div>
-            <div><div class="rec-stat-val" style="color:var(--txt);font-size:14px">${grossLabel(best)}</div><div class="rec-stat-label">Taxa bruta</div></div>
-            <div><div class="rec-stat-val" style="color:${best.garantia==='FGC'?'var(--blue)':best.garantia==='Soberano'?'var(--green)':'var(--amber)'}">${best.garantia}</div><div class="rec-stat-label">Garantia</div></div>
-            <div><div class="rec-stat-val" style="color:${best.irExempt?'var(--green)':'var(--txt2)'}${best.irExempt?'':';font-size:14px'}">${best.irExempt?'Isento':'Tributado'}</div><div class="rec-stat-label">Imposto de Renda</div></div>
-          </div>
-        </div>
-        <div class="rec-why">${whyRecommend(best,net)}</div>
-        <button class="rec-add-btn" onclick="openAddAtivoModal('${best.id}')">+ Adicionar →</button>
-      </div>`;
-  } else {
-    document.getElementById('explore-rec-card').innerHTML = '';
+  // ── TOP 3 recomendações ──
+  const top3 = list.slice(0,3);
+  let top3Html = '';
+  if (top3.length) {
+    const rankClass = ['rank-1','rank-2','rank-3'];
+    top3Html = `
+      <div style="margin-bottom:6px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3)">
+          🏆 Top 3 — Melhor rentabilidade líquida (${list.length} produtos analisados)
+        </span>
+      </div>
+      <div class="top3-grid">` +
+      top3.map((a,i) => {
+        const net    = calcNetYield(a);
+        const garCls = a.garantia==='FGC'?'tag-blue':a.garantia==='Soberano'?'tag-green':'tag-amber';
+        const liqCls = (a.liq==='D+0'||a.liq==='D+1')?'tag-green':a.liq==='No venc.'?'tag-amber':'tag-purple';
+        return `
+          <div class="top3-card ${rankClass[i]}">
+            <div class="top3-rank">${rankEmoji[i]}</div>
+            <div class="top3-name">${a.name}</div>
+            <div class="top3-bank"><span class="bank-dot" style="background:${a.bColor}"></span>${a.bank}</div>
+            <div class="top3-yield ${yieldCls(net)}">${fmtYield(net)}</div>
+            <div class="top3-yield-label">Rentab. líquida / ano · ${grossLabel(a)}</div>
+            <div class="top3-tags">
+              <span class="tag ${garCls}">${a.garantia}</span>
+              <span class="tag ${liqCls}">${a.liq}</span>
+              <span class="tag ${a.irExempt?'tag-green':'tag-blue'}" style="font-size:9px">${a.irExempt?'IR isento':a.type}</span>
+              <span class="tag" style="background:rgba(148,163,184,.07);color:var(--txt3)">${a.prazo}</span>
+            </div>
+            <div style="font-size:11px;color:var(--txt2);line-height:1.55;margin-bottom:10px;flex:1">${whyRecommend(a,net)}</div>
+            <button class="top3-add-btn" onclick="openAddAtivoModal('${a.id}')">+ Adicionar à carteira</button>
+          </div>`;
+      }).join('') + `</div>`;
   }
+
+  // ── Comparação direta: Inter · Nubank · BTG ──
+  const cmpBanks = ['Banco Inter','Nubank','BTG Pactual'];
+  const cmpTypes = ['CDB','LCI','LCA'];
+  let cmpHtml = `
+    <div class="bank-compare-section">
+      <div class="bank-compare-title">⚔️ Comparação direta — Inter · Nubank · BTG Pactual</div>`;
+
+  cmpTypes.forEach(tipo => {
+    cmpHtml += `
+      <div style="font-size:11px;font-weight:600;color:var(--txt2);margin-bottom:8px;margin-top:14px;letter-spacing:.04em">${tipo}</div>
+      <div class="bank-compare-grid">`;
+    cmpBanks.forEach(bank => {
+      const produtos = BANK_CATALOG.filter(a => a.bank === bank && a.type === tipo)
+                                   .sort((a,b) => calcNetYield(b)-calcNetYield(a));
+      if (!produtos.length) {
+        cmpHtml += `<div class="bank-cmp-card" style="opacity:.4;display:flex;align-items:center;justify-content:center;min-height:110px">
+          <span style="font-size:11px;color:var(--txt3)">${bank}<br><span style="font-size:10px">Não disponível</span></span>
+        </div>`;
+        return;
+      }
+      const best = produtos[0]; // melhor produto desse banco nesse tipo
+      const net  = calcNetYield(best);
+      const garCls = best.garantia==='FGC'?'tag-blue':best.garantia==='Soberano'?'tag-green':'tag-amber';
+      const liqCls = (best.liq==='D+0'||best.liq==='D+1')?'tag-green':best.liq==='No venc.'?'tag-amber':'tag-purple';
+      cmpHtml += `
+        <div class="bank-cmp-card">
+          <div class="bank-cmp-name">${best.name}</div>
+          <div class="bank-cmp-bank"><span class="bank-dot" style="background:${best.bColor}"></span>${bank}</div>
+          <div class="bank-cmp-yield">${fmtYield(net)}</div>
+          <div class="bank-cmp-sub">Líquido · ${grossLabel(best)} · ${best.prazo}</div>
+          <div class="bank-cmp-tags">
+            <span class="tag ${garCls}">${best.garantia}</span>
+            <span class="tag ${liqCls}">${best.liq}</span>
+            ${best.irExempt?'<span class="tag tag-green" style="font-size:9px">Isento IR</span>':''}
+          </div>
+          <button class="bank-cmp-add" onclick="openAddAtivoModal('${best.id}')">+ Adicionar</button>
+        </div>`;
+    });
+    cmpHtml += `</div>`;
+  });
+  cmpHtml += `</div>`;
+
+  // Monta o bloco completo de recomendações
+  document.getElementById('explore-rec-card').innerHTML = top3Html + ((!_ativoFilters.banco && !_ativoFilters.tipo) ? cmpHtml : '');
 
   document.getElementById('catalog-count-title').textContent =
     `${list.length} produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}`;
 
-  // Tabela do catálogo
-  document.getElementById('catalog-tbody').innerHTML = list.map(a => {
+  // ── Tabela completa ──
+  document.getElementById('catalog-tbody').innerHTML = list.map((a,i) => {
     const net    = calcNetYield(a);
-    const isBest = a.id === bestId;
+    const isTop  = i < 3;
     const liqCls = (a.liq==='D+0'||a.liq==='D+1') ? 'tag-green' : a.liq==='No venc.' ? 'tag-amber' : 'tag-purple';
     const garCls = a.garantia==='FGC' ? 'tag-blue' : a.garantia==='Soberano' ? 'tag-green' : 'tag-amber';
-    return `<tr class="${isBest?'best-row':''}">
-      <td><span class="cat-name">${a.name}${isBest?'<span class="best-tag">⭐ Melhor</span>':''}</span></td>
+    return `<tr class="${i===0?'best-row':''}">
+      <td><span class="cat-name">${i<3?rankEmoji[i]+' ':''} ${a.name}${i===0?'<span class="best-tag">Melhor</span>':''}</span></td>
       <td><span style="display:inline-flex;align-items:center;gap:5px">
         <span class="bank-dot" style="background:${a.bColor}"></span>
         <span class="bank-name-sm">${a.bank}</span>
