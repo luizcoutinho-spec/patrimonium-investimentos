@@ -3435,18 +3435,38 @@ function afterAuth() {
       document.getElementById('onboarding').style.display = 'block';
     }
   } else {
-    document.getElementById('onboarding').style.display = 'block';
+    // Sem metadados de onboarding — verifica se o usuário já tem ativos/carteiras.
+    // Isso acontece quando os dados de onboarding são apagados mas o portfólio persiste.
+    const hasPortfolio = getAtivos('principal').length > 0 || getCarteiras().length > 0;
+    if (hasPortfolio) {
+      // Reconstrói a chave de onboarding com os valores atuais e abre o app diretamente.
+      localStorage.setItem(key, JSON.stringify({
+        name: S.name, wealth: S.wealth, profile: S.profile,
+        riskScore: S.riskScore, goals: S.goals,
+        horizon: S.horizon, liquidity: S.liquidity, income: S.income
+      }));
+      document.getElementById('onboarding').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initApp();
+    } else {
+      document.getElementById('onboarding').style.display = 'block';
+    }
   }
   setTimeout(updateSidebarUser, 120);
 }
 
 function updateSidebarUser() {
   if (!CURRENT_USER) return;
-  const first = (CURRENT_USER.name || 'Usuário').split(' ')[0];
-  document.getElementById('s-user-name').textContent = first;
-  document.getElementById('s-avatar-letter').textContent = first[0].toUpperCase();
-  const emailEl = document.getElementById('s-user-email');
-  if (emailEl) emailEl.textContent = CURRENT_USER.isDemo ? 'Modo demonstração' : (CURRENT_USER.email || '');
+  const fullName = CURRENT_USER.name || 'Usuário';
+  const first    = fullName.split(' ')[0];
+  const nameEl   = document.getElementById('s-user-name');
+  const avatarEl = document.getElementById('s-avatar-letter');
+  const emailEl  = document.getElementById('s-user-email');
+  if (nameEl)   nameEl.textContent   = first;
+  if (avatarEl) avatarEl.textContent = first[0].toUpperCase();
+  if (emailEl)  emailEl.textContent  = CURRENT_USER.isDemo
+    ? 'Modo demonstração'
+    : (CURRENT_USER.email || fullName);
 }
 
 // ── Logout ──
@@ -4212,12 +4232,16 @@ document.getElementById('tb-date').textContent = new Date().toLocaleDateString('
 });
 
 (function boot() {
-  // Sessão Google salva?
-  const gsiUser = localStorage.getItem('pat_gsi_user');
-  if (gsiUser) { try { CURRENT_USER = JSON.parse(gsiUser); afterAuth(); return; } catch(e){} }
+  // Sessão salva (login/registro)?
+  try {
+    const gsiRaw = localStorage.getItem('pat_gsi_user');
+    if (gsiRaw) { CURRENT_USER = JSON.parse(gsiRaw); afterAuth(); return; }
+  } catch(e) { CURRENT_USER = null; }
   // Sessão demo salva?
-  const demoUser = localStorage.getItem('pat_demo_user');
-  if (demoUser) { try { CURRENT_USER = JSON.parse(demoUser); afterAuth(); return; } catch(e){} }
+  try {
+    const demoRaw = localStorage.getItem('pat_demo_user');
+    if (demoRaw) { CURRENT_USER = JSON.parse(demoRaw); afterAuth(); return; }
+  } catch(e) { CURRENT_USER = null; }
   // Sem sessão → tela de login
   showLoginScreen();
 })();
