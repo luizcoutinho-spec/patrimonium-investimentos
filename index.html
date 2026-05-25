@@ -3868,6 +3868,14 @@ function renderMinhaCarteira() {
   const totalNetGain = Math.max(0, totalGain - totalIRProv);
   const totalGainPct = totalCapital > 0 ? (totalGain/totalCapital*100) : 0;
   const totalNetGPct = totalCapital > 0 ? (totalNetGain/totalCapital*100) : 0;
+  const totalDaily   = ativos.reduce((s,a) => {
+    const net = calcNetYield(a); const val = currentValue(a);
+    return s + val * (Math.pow(1 + net/100, 1/365) - 1);
+  }, 0);
+  const totalMonthly = ativos.reduce((s,a) => {
+    const net = calcNetYield(a); const val = currentValue(a);
+    return s + val * (Math.pow(1 + net/100, 1/12) - 1);
+  }, 0);
   rows += `<tr class="tbl-grand-total">
     <td colspan="2"><span class="tbl-grand-label">Total da Carteira</span></td>
     <td>
@@ -3882,7 +3890,12 @@ function renderMinhaCarteira() {
       <div class="mono" style="font-size:12px;font-weight:700;color:var(--green);margin-top:2px">+R$&nbsp;${R(totalNetGain)} líquido</div>
       <div style="font-size:10px;font-weight:600;color:var(--green)">+${totalNetGPct.toFixed(2).replace('.',',')}% líquido</div>`:''}
     </td>
-    <td></td>
+    <td>
+      <div class="mono" style="font-size:13px;font-weight:800;color:var(--green)">+R$&nbsp;${R(totalDaily)}</div>
+      <div style="font-size:10px;color:var(--txt3);margin-bottom:5px">por dia</div>
+      <div class="mono" style="font-size:12px;font-weight:700;color:var(--txt2)">+R$&nbsp;${R(totalMonthly)}</div>
+      <div style="font-size:10px;color:var(--txt3)">por mês</div>
+    </td>
     <td style="text-align:center;font-size:12px;font-weight:800;color:var(--green)">100%</td>
     <td class="mono tbl-grand-net">${fmtYield(grandNetAvg)}</td>
     <td colspan="2"></td>
