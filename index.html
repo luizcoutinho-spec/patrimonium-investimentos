@@ -3864,7 +3864,8 @@ function renderDailyYield(ativos, ids) {
       <td><span class="mono ${yieldCls(net)}" style="font-weight:700">${fmtYield(net)}</span></td>
       <td class="dy-val">${fmtR(daily)}</td>
       <td class="dy-month">${fmtR(monthly)}</td>
-    </tr>`;);
+    </tr>`;
+  });
 
   rows.push(`<tr class="dy-total-row">
     <td colspan="2" style="color:var(--txt);font-size:12px;letter-spacing:.04em;text-transform:uppercase">Total da Carteira</td>
