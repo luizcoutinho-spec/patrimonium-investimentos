@@ -1702,9 +1702,10 @@ function nav(view, el) {
 // ══════════════════ DASHBOARD CHARTS ══════════════════
 function initDashboardCharts() { refreshDashboard(); }
 
-// Atualiza tudo: dashboard geral + workspace (se aberto) + lista de carteiras
+// Atualiza tudo: dashboard geral + lista de carteiras + workspace (se aberto)
 function refreshAll() {
-  refreshAll();
+  refreshDashboard();
+  renderCarteirasList();
   if (_activeCarteira) initCwsDashboard();
 }
 
