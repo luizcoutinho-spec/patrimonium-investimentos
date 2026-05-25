@@ -3435,7 +3435,25 @@ function afterAuth() {
       document.getElementById('onboarding').style.display = 'block';
     }
   } else {
-    document.getElementById('onboarding').style.display = 'block';
+    // pat_ob_ ausente — se houver ativos ou carteiras, recupera sessão sem onboarding
+    let hasData = false;
+    try { hasData = getAtivos('principal').length > 0 || getCarteiras().length > 0; } catch(e) {}
+    if (hasData) {
+      try {
+        localStorage.setItem(key, JSON.stringify({
+          name: S.name, wealth: S.wealth, profile: S.profile,
+          riskScore: S.riskScore, goals: S.goals,
+          horizon: S.horizon, liquidity: S.liquidity, income: S.income
+        }));
+        document.getElementById('onboarding').style.display = 'none';
+        document.getElementById('app').classList.add('show');
+        initApp();
+      } catch(e) {
+        document.getElementById('onboarding').style.display = 'block';
+      }
+    } else {
+      document.getElementById('onboarding').style.display = 'block';
+    }
   }
   setTimeout(updateSidebarUser, 120);
 }
